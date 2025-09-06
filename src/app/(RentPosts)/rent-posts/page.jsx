@@ -53,12 +53,8 @@ const RentPostsPage = () => {
       </h1>
       <div className="w-full mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 px-2 sm:px-6">
         {posts.map((post) => (
-          <Link
-            key={post._id}
-            href={`/rent-posts/${post._id}`}
-            className="no-underline text-inherit"
-          >
-            <div className="flex flex-col bg-white rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.03] transition-all duration-200 cursor-pointer overflow-hidden">
+          <div key={post._id} className="flex flex-col bg-white rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.03] transition-all duration-200 cursor-pointer overflow-hidden">
+            <Link href={`/rent-posts/${post._id}`} className="no-underline text-inherit">
               <img
                 src={post.imageUrl}
                 alt={post.title}
@@ -114,30 +110,32 @@ const RentPostsPage = () => {
                     {['Vehicles', 'Tools & Equipment', 'Events & Venues'].includes(post.category) ? '/day' : '/month'}
                   </span>
                 </div>
-                <button className="w-full bg-blue-600 text-white font-semibold py-2 rounded-xl text-sm hover:bg-blue-700 transition mb-2">
-                  See Detail
-                </button>
-                <div className="flex flex-row gap-2 w-full">
-                  <Link href={`/edit-rent-posts/${post._id}`} className="w-1/2">
-                    <button type="button" className="w-full bg-yellow-500 text-white font-semibold py-2 rounded-xl text-sm hover:bg-yellow-600 transition">
-                      Edit
-                    </button>
-                  </Link>
-                  <button
-                    type="button"
-                    className="w-1/2 bg-red-600 text-white font-semibold py-2 rounded-xl text-sm hover:bg-red-700 transition"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleDelete(post._id);
-                    }}
-                  >
-                    Delete
-                  </button>
-                </div>
               </div>
+            </Link>
+            <div className="flex flex-row gap-2 w-full px-6 pb-6">
+              <Link href={`/rent-posts/${post._id}`} className="w-1/2">
+                <span className="w-full bg-blue-600 text-white font-semibold py-2 rounded-xl text-sm hover:bg-blue-700 transition flex items-center justify-center cursor-pointer">
+                  View Detail
+                </span>
+              </Link>
+              <Link href={`/edit-rent-posts/${post._id}`} className="w-1/2">
+                <span className="w-full bg-yellow-500 text-white font-semibold py-2 rounded-xl text-sm hover:bg-yellow-600 transition flex items-center justify-center cursor-pointer">
+                  Edit
+                </span>
+              </Link>
+              <button
+                type="button"
+                className="w-1/2 bg-red-600 text-white font-semibold py-2 rounded-xl text-sm hover:bg-red-700 transition"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleDelete(post._id);
+                }}
+              >
+                Delete
+              </button>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
     </div>
