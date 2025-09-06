@@ -1,51 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const imgbbApiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 
-const categories = {
-  "Properties & Living": [
-    "Houses",
-    "Flats / Apartments",
-    "Rooms",
-    "Resorts / Holiday Homes",
-    "Hostels / Dormitories",
-  ],
-  "Vehicles": [
-    "Cars",
-    "Motorbikes / Scooters",
-    "Bicycles",
-    "Vans / Trucks",
-    "Boats",
-  ],
-  "Land & Nature": [
-    "Agricultural Land (Rice fields, farms)",
-    "Ponds / Fisheries",
-    "Gardens / Orchards",
-    "Barns / Storage Sheds",
-  ],
-  "Events & Venues": [
-    "Banquet Halls",
-    "Party Spaces",
-    "Garages / Parking Spaces",
-    "Meeting Rooms / Co-working Spaces",
-    "Outdoor Event Grounds",
-  ],
-  "Tools & Equipment": [
-    "Construction Tools (drills, saws, ladders)",
-    "Farming Tools",
-    "Cameras / Drones",
-    "Musical Instruments",
-    "Electronics (projectors, speakers)",
-  ],
-  "Lifestyle & Others": [
-    "Furniture (sofa, bed, tables)",
-    "Home Appliances (AC, fridge, washing machine)",
-    "Sports Gear (bats, balls, gym equipment)",
-    "Costumes / Dresses (wedding, parties)",
-    "Books / Educational Materials",
-  ],
-};
+// ...existing code...
 
 const initialForm = {
   category: "",
@@ -67,15 +25,31 @@ const initialForm = {
 
 const AddRentPostsPage = () => {
   const [form, setForm] = useState(initialForm);
+  const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [mapPosition, setMapPosition] = useState({ lat: 23.685, lng: 90.3563 }); // Bangladesh center
+  // Fetch categories from DB
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/add-catagory");
+        if (res.ok) {
+          const data = await res.json();
+          setCategories(data);
+        }
+      } catch {}
+    };
+    fetchCategories();
+  }, []);
 
   // Handle input changes
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "category") {
       setForm((prev) => ({ ...prev, category: value, subcategory: "" }));
-      setSubcategories(categories[value] || []);
+      // Find selected category object from DB
+      const selectedCat = categories.find((cat) => cat.name === value);
+      setSubcategories(selectedCat ? selectedCat.subcategories : []);
     } else if (name === "subcategory") {
       setForm((prev) => ({ ...prev, subcategory: value }));
     } else if (name === "imageFile" && files && files[0]) {
@@ -166,8 +140,8 @@ const AddRentPostsPage = () => {
                 required
               >
                 <option value="">Select Category</option>
-                {Object.keys(categories).map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
+                {categories.map((cat) => (
+                  <option key={cat._id || cat.name} value={cat.name}>{cat.name}</option>
                 ))}
               </select>
             </div>
