@@ -1,4 +1,5 @@
 import React from "react";
+import AIInsights from "./AIInsights";
 
 import { notFound } from "next/navigation";
 
@@ -87,31 +88,7 @@ const DetailPage = async (props) => {
         </div>
       </main>
       {/* AI Insights full width under image */}
-      <div className="w-full mx-auto px-2 sm:px-6">
-        <div className="bg-gray-50 rounded-xl p-4">
-          <div className="font-semibold text-gray-800 mb-2">AI Insights</div>
-          <div className="flex gap-3 items-center">
-            <div className="w-14 h-14 bg-gray-200 rounded-lg flex items-center justify-center">
-              <svg
-                width="28"
-                height="28"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="text-gray-400"
-              >
-                <rect x="6" y="6" width="16" height="16" rx="4" />
-              </svg>
-            </div>
-            <div>
-              <div className="font-bold text-gray-700">Pros & Cons</div>
-              <div className="text-xs text-gray-500">
-                AI-generated insights based on reviews and property details
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <AIInsights post={post} />
       {/* Map Section */}
       <section className="w-full mx-auto px-2 sm:px-6 mt-8 flex flex-col items-center">
         <div className="mb-2 text-lg font-semibold text-gray-800 self-start">
