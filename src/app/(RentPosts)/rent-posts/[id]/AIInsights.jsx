@@ -50,29 +50,27 @@ const AIInsights = ({ post }) => {
                 const clean = (str) => str ? str.replace(/\*/g, '').trim() : null;
                   const pros = prosMatch ? clean(prosMatch[1]) : null;
                   const cons = consMatch ? clean(consMatch[1]) : null;
-                  const prosList = pros ? pros.split(/\n|\r|•|-/).map(s => s.trim()).filter(Boolean).slice(0, 5) : [];
-                  const consList = cons ? cons.split(/\n|\r|•|-/).map(s => s.trim()).filter(Boolean).slice(0, 2) : [];
+                  // Improved line break handling: split on \r\n, \n, \r, bullet, or dash, but also normalize multiple breaks
+                  const normalizeBreaks = (str) => str.replace(/\r\n|\r|\n/g, "\n");
+                  const prosList = pros ? normalizeBreaks(pros).split(/\n|•|-/).map(s => s.trim()).filter(Boolean).slice(0, 5) : [];
+                  const consList = cons ? normalizeBreaks(cons).split(/\n|•|-/).map(s => s.trim()).filter(Boolean).slice(0, 2) : [];
                   return (
                     <>
                       <div className="mb-2">
                         <span className="font-semibold text-green-700">Pros</span>
-                        <ul className="list-disc ml-6 text-gray-800">
+                        <div className="text-gray-800 mt-1">
                           {prosList.length
-                            ? prosList.map((item, idx) => (
-                                <li key={idx}>{item}</li>
-                              ))
-                            : <li>No pros listed.</li>}
-                        </ul>
+                            ? <p>{prosList.join(' ')}</p>
+                            : <span>No pros listed.</span>}
+                        </div>
                       </div>
                       <div>
                         <span className="font-semibold text-red-700">Cons</span>
-                        <ul className="list-disc ml-6 text-gray-800">
+                        <div className="text-gray-800 mt-1">
                           {consList.length
-                            ? consList.map((item, idx) => (
-                                <li key={idx}>{item}</li>
-                              ))
-                            : <li>No cons listed.</li>}
-                        </ul>
+                            ? <p>{consList.join(' ')}</p>
+                            : <span>No cons listed.</span>}
+                        </div>
                       </div>
                     </>
                   );
