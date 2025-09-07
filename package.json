@@ -9,12 +9,17 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "bcryptjs": "^3.0.2",
+    "daisyui": "^5.1.7",
     "mongodb": "^6.19.0",
     "next": "15.5.2",
     "next-auth": "^4.24.11",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-hook-form": "^7.62.0"
+    "react-hook-form": "^7.62.0",
+    "sweetalert2": "^11.23.0",
+    "tailwindcss": "^4.1.13"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

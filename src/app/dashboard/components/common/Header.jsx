@@ -1,8 +1,4 @@
 const Header = () => (
-<<<<<<< HEAD
-    <header style={{ padding: '20px', background: '#f4f4f4' }}>
-        <h1>Rent Hub Dashboard</h1>
-=======
     <header className="navbar bg-base-100 shadow-md px-6">
         <div className="flex-1">
             <h1 className="text-2xl font-bold text-primary bg-gray-600">
@@ -18,7 +14,6 @@ const Header = () => (
                 </div>
             </div>
         </div>
->>>>>>> 5be7c9a0987938644751d22e17bcf21ac7c524d5
     </header>
 );
 
