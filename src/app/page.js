@@ -29,6 +29,7 @@ export default function Home() {
                         View All Products
                     </Link>
                 </div>
+                <Banner></Banner>
                 <SessionProvider>
                     <BecomeOwnerSection />
                 </SessionProvider>

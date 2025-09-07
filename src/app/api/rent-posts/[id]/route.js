@@ -47,3 +47,4 @@ export async function DELETE(req, context) {
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 }
+

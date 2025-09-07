@@ -1,3 +1,4 @@
+
 import Navbar from '@/components/Navbar';
 import { ThemeProvider } from '@/components/theme-provider';
 import { authOptions } from '@/lib/authOptions';
@@ -5,6 +6,10 @@ import SessionProviderWrapper from '@/Providers/SessionProvider';
 import { getServerSession } from 'next-auth';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+
+import { ModeToggle } from "@/components/ModeToggle";
+import NextAuthProvider from "@/Providers/NextAuthProvider";
+
 
 const geistSans = Geist({
     variable: '--font-geist-sans',
@@ -46,7 +51,7 @@ export default async function RootLayout({ children }) {
                     >
                         <Navbar />
                         
-                        {children}
+                       <NextAuthProvider>{children}</NextAuthProvider>
                     </ThemeProvider>
                 </SessionProviderWrapper>
             </body>
