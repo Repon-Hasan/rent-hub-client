@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, Suspense } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 
 async function getRentPosts() {
@@ -25,16 +25,16 @@ function formatDate(dateStr) {
   return `${day}${suffix} ${month} ${year}`;
 }
 const RentPostsList = ({ posts, handleDelete }) => (
-  <div className="w-full mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 px-2 sm:px-6">
+  <div className="w-full mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 px-2 sm:px-3">
     {posts.map((post) => (
-      <div key={post._id} className="flex flex-col bg-white rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.03] transition-all duration-200 cursor-pointer overflow-hidden">
+      <div key={post._id} className="flex flex-col bg-white rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 cursor-pointer overflow-hidden mx-auto">
         <Link href={`/rent-posts/${post._id}`} className="no-underline text-inherit">
           <img
             src={post.imageUrl}
             alt={post.title}
-            className="w-full h-56 object-cover rounded-t-2xl"
+            className="w-full h-36 object-cover rounded-t-xl"
           />
-          <div className="flex flex-row gap-2 px-6 pt-4">
+          <div className="flex flex-row gap-1 px-3 pt-2">
             <span className="bg-gray-100 text-gray-700 text-xs font-semibold px-2 py-1 rounded-lg">
               {post.category}
             </span>
@@ -44,17 +44,17 @@ const RentPostsList = ({ posts, handleDelete }) => (
               </span>
             )}
           </div>
-          <div className="flex flex-col gap-3 p-6">
-            <div className="text-xs text-gray-500 mb-1 font-medium">
+          <div className="flex flex-col gap-1 p-3">
+            <div className="text-xs text-gray-500 mb-0 font-medium truncate">
               {post.location}
             </div>
-            <h2 className="text-lg font-bold text-gray-900 mb-1 leading-tight">
+            <h2 className="text-base font-bold text-gray-900 mb-0 leading-tight truncate">
               {post.title}
             </h2>
-            <p className="text-sm text-gray-700 mb-2 leading-relaxed line-clamp-2">
+            <p className="text-xs text-gray-700 mb-1 leading-snug line-clamp-2">
               {post.description}
             </p>
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-1 mb-1">
               <span
                 className={`px-2 py-1 rounded-lg text-xs font-semibold ${
                   new Date(post.availableFrom) <= new Date() &&
@@ -73,7 +73,7 @@ const RentPostsList = ({ posts, handleDelete }) => (
                 {formatDate(post.availableTo)}
               </span>
             </div>
-            <div className="text-xl font-extrabold text-blue-700 mb-3">
+            <div className="text-base font-extrabold text-blue-700 mb-1">
               ৳
               {typeof post.rentPrice === "number"
                 ? post.rentPrice.toLocaleString()
@@ -86,20 +86,20 @@ const RentPostsList = ({ posts, handleDelete }) => (
             </div>
           </div>
         </Link>
-        <div className="flex flex-row gap-2 w-full px-6 pb-6">
+        <div className="flex flex-row gap-2 w-full px-3 pb-3">
           <Link href={`/rent-posts/${post._id}`} className="w-1/2">
-            <span className="w-full bg-blue-600 text-white font-semibold py-2 rounded-xl text-sm hover:bg-blue-700 transition flex items-center justify-center cursor-pointer">
+            <span className="w-full bg-blue-600 text-white font-semibold py-1.5 rounded-xl text-sm hover:bg-blue-700 transition flex items-center justify-center cursor-pointer">
               View Detail
             </span>
           </Link>
           <Link href={`/edit-rent-posts/${post._id}`} className="w-1/2">
-            <span className="w-full bg-yellow-500 text-white font-semibold py-2 rounded-xl text-sm hover:bg-yellow-600 transition flex items-center justify-center cursor-pointer">
+            <span className="w-full bg-yellow-500 text-white font-semibold py-1.5 rounded-xl text-sm hover:bg-yellow-600 transition flex items-center justify-center cursor-pointer">
               Edit
             </span>
           </Link>
           <button
             type="button"
-            className="w-1/2 bg-red-600 text-white font-semibold py-2 rounded-xl text-sm hover:bg-red-700 transition"
+            className="w-1/2 bg-red-600 text-white font-semibold py-1.5 rounded-xl text-sm hover:bg-red-700 transition"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -117,7 +117,10 @@ const RentPostsList = ({ posts, handleDelete }) => (
 const RentPostsPage = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  React.useEffect(() => {
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [categories, setCategories] = useState(["All"]);
+
+  useEffect(() => {
     async function fetchPosts() {
       setLoading(true);
       const res = await fetch("/api/rent-posts", { cache: "no-store" });
@@ -132,6 +135,31 @@ const RentPostsPage = () => {
     fetchPosts();
   }, []);
 
+  // Fetch categories from /api/add-catagory
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/add-catagory");
+        if (res.ok) {
+          const data = await res.json();
+          // Defensive: handle if data is not array or empty
+          if (Array.isArray(data) && data.length > 0) {
+            // Use 'name' property, fallback to _id if missing
+            const catNames = ["All", ...data.map((cat) => cat.name ? cat.name : (cat._id || ""))].filter(Boolean);
+            setCategories(catNames);
+          } else {
+            setCategories(["All"]);
+          }
+        } else {
+          setCategories(["All"]);
+        }
+      } catch (err) {
+        setCategories(["All"]);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
     const res = await fetch(`/api/rent-posts/${id}`, { method: "DELETE" });
@@ -143,18 +171,43 @@ const RentPostsPage = () => {
     }
   };
 
+  // Filter posts by selected category
+  const filteredPosts =
+    selectedCategory === "All"
+      ? posts
+      : posts.filter((p) => p.category === selectedCategory);
+
   return (
     <div className="min-h-screen w-full bg-white flex flex-col py-12">
-      <h1 className="text-center mb-10 text-4xl font-bold text-gray-900 tracking-wide font-sans">
-        Universal Rent Hub
+      <h1 className="text-center mb-8 text-4xl font-bold text-gray-900 tracking-wide font-sans">
+        All Rent Posts
       </h1>
+      <div className="w-full flex justify-left mb-8 ml-8">
+        <div className="w-full max-w-xs">
+          <label htmlFor="category" className="block mb-2 text-sm font-medium text-gray-700">
+            Filter by Category
+          </label>
+          <select
+            id="category"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="block w-full px-4 py-2 text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 shadow-sm"
+          >
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
       <Suspense fallback={<div className="w-full flex justify-center items-center py-20"><span className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid"></span></div>}>
         {loading ? (
           <div className="w-full flex justify-center items-center py-20">
             <span className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid"></span>
           </div>
         ) : (
-          <RentPostsList posts={posts} handleDelete={handleDelete} />
+          <RentPostsList posts={filteredPosts} handleDelete={handleDelete} />
         )}
       </Suspense>
     </div>
