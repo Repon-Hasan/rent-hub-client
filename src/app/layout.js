@@ -4,6 +4,8 @@ import "./globals.css";
 export const metadata = {
   title: "Rent Hub",
   description: "Your go-to rent website",
+  title: "Rent Hub",
+  description: "Your go-to rent website",
 };
 
 export default function RootLayout({ children }) {
