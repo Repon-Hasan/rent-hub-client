@@ -29,11 +29,14 @@ const DetailPage = async (props) => {
       <main className="w-full mx-auto px-2 sm:px-6 py-8 flex flex-col md:flex-row gap-10">
         {/* Left: Image */}
         <div className="md:w-7/12 w-full flex flex-col items-center justify-center gap-4">
-          <img
-            src={post.imageUrl}
-            alt={post.title}
-            className="w-full max-h-[420px] object-cover rounded-2xl shadow-lg"
-          />
+          <div className="w-full aspect-video rounded-2xl shadow-lg overflow-hidden flex items-center justify-center bg-gray-100">
+            <img
+              src={post.imageUrl}
+              alt={post.title}
+              className="w-full h-full object-contain rounded-2xl"
+              style={{ maxHeight: '480px', background: 'white' }}
+            />
+          </div>
         </div>
         {/* Right: Details */}
         <div className="md:w-5/12 w-full flex flex-col gap-5 justify-center">
