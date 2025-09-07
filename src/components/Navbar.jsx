@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Bell, Menu, LogOut, User, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ModeToggle } from "./ModeToggle";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -13,6 +12,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
+import { ModeToggle } from "./ModeToggle";
 
 export default function Navbar() {
   const pathname = usePathname();
