@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/ModeToggle";
 import Navbar from "@/components/Navbar";
 import Banner from "@/components/ui/Banner";
+import NextAuthProvider from "@/Providers/NextAuthProvider";
 
 
 
@@ -36,7 +37,7 @@ export default function RootLayout({ children }) {
           >
           <Navbar></Navbar>
           <Banner></Banner>
-            {children}
+            <NextAuthProvider>{children}</NextAuthProvider>
           </ThemeProvider>
       </body>
     </html>
