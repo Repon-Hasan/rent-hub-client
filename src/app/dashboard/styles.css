@@ -1,0 +1,36 @@
+nav {
+  width: 250px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background-color: #333;
+  color: white;
+}
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+nav li {
+  padding: 15px;
+}
+
+nav li a {
+  color: white;
+  text-decoration: none;
+}
+
+/* Header */
+header {
+  margin-left: 250px;
+  padding: 20px;
+  background-color: #f4f4f4;
+}
+
+/* Main */
+main {
+  margin-left: 250px;
+  padding: 20px;
+}
