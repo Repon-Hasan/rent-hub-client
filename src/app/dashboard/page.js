@@ -1,97 +1,98 @@
-import Header from './components/common/Header';
-import AdminSidebar from './components/admin/Sidebar';
-import VendorSidebar from './components/vendor/Sidebar';
-import UserSidebar from './components/user/Sidebar';
+'use client';
+
+import { useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
 import StatsCard from './components/common/StatsCard';
-import RentalsTable from './components/admin/RentalsTable';
-import Image from 'next/image';
+import AdminContent from './components/admin/DashboardConent';
+import VendorContent from './components/vendor/DashboardConent';
+import UserContent from './components/user/DashboardConent';
 
-export default async function DashboardPage({
-    userRole = 'admin',
-    userEmail = '',
-}) {
-    // API fetch
-    const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/rent-posts`,
-        {
-            cache: 'no-store',
-        },
-    );
-    const allRentals = await res.json();
+export default function Dashboard() {
+    const { data: session, status } = useSession();
+    const [rentals, setRentals] = useState([]);
+    const [stats, setStats] = useState({
+        totalRentals: 0,
+        totalUsers: 0,
+        totalVendors: 0,
+    });
+    const [loading, setLoading] = useState(true);
 
-    // Sidebar component
-    let SidebarComponent;
-    if (userRole === 'admin') SidebarComponent = AdminSidebar;
-    else if (userRole === 'vendor') SidebarComponent = VendorSidebar;
-    else SidebarComponent = UserSidebar;
+    useEffect(() => {
+        const fetchRentals = async () => {
+            try {
+                const res = await fetch(
+                    `${process.env.NEXT_PUBLIC_BASE_URL}/api/rent-posts`,
+                    {
+                        cache: 'no-store',
+                    },
+                );
+                if (!res.ok) throw new Error('Failed to fetch rentals');
+                const data = await res.json();
+                setRentals(data);
+                setStats({
+                    totalRentals: data.length,
+                    totalUsers: 150, // Mock
+                    totalVendors: data.filter((r) => r.type === 'vendor')
+                        .length,
+                });
+            } catch (error) {
+                console.error('Error fetching rentals:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        if (session) fetchRentals();
+    }, [session]);
 
-    // Filter rentals per role
-    let rentals = [];
-    if (userRole === '') {
-        rentals = allRentals;
-    } else if (userRole === 'vendor') {
-        rentals = allRentals.filter((r) => r.email === userEmail);
-    } else {
-        rentals = allRentals.filter(
-            (r) => new Date(r.availableFrom) <= new Date(),
+    if (status === 'loading' || loading) {
+        return <div className="text-center p-6">Loading Dashboard...</div>;
+    }
+
+    if (!session) {
+        return (
+            <div className="text-center p-6">
+                Access Denied. Please sign in.
+            </div>
         );
     }
 
-    // Stats
-    const totalRentals = allRentals.length;
-    const totalUsers = 100; // example
-    const totalVendors = allRentals.filter((r) => r.type === 'vendor').length;
+    const role = session.user?.role || 'user';
+    const userEmail = session.user?.email || '';
+    let ContentComponent;
+    let displayedRentals = rentals;
+
+    if (role === 'admin') {
+        ContentComponent = AdminContent;
+    } else if (role === 'vendor') {
+        ContentComponent = VendorContent; // Vendor sees all rentals
+    } else {
+        displayedRentals = rentals.filter((r) => r.status === 'approved');
+        ContentComponent = UserContent;
+    }
 
     return (
-        <div className="flex min-h-screen bg-base-200">
-            <SidebarComponent />
-
-            <div className="flex-1 p-4">
-                <Header />
-
-                {/* Stats Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
-                    <StatsCard title="Total Rentals" value={totalRentals} />
-                    <StatsCard title="Total Users" value={totalUsers} />
-                    <StatsCard title="Total Vendors" value={totalVendors} />
-                </div>
-
-                {/* Admin sees table */}
-                {/* {userRole === 'admin' && <RentalsTable rentals={rentals} />} */}
-
-                {/* Vendor / User sees cards */}
-                {(userRole === 'vendor' || userRole === 'user') && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {rentals.map((rental) => (
-                            <div
-                                key={rental._id}
-                                className="card bg-base-100 shadow-xl"
-                            >
-                                <figure>
-                                    <Image
-                                        src={rental.imageUrl}
-                                        alt={rental.title}
-                                        width={400}
-                                        height={200}
-                                        className="w-full h-48 object-cover"
-                                    />
-                                </figure>
-                                <div className="card-body">
-                                    <h2 className="card-title">
-                                        {rental.title}
-                                    </h2>
-                                    <p className="text-sm text-gray-500">
-                                        {rental.type} • {rental.location}
-                                    </p>
-                                    <p className="font-bold">
-                                        Rent: ৳{rental.rentPrice}
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
+        <div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <StatsCard
+                    title="Total Rentals"
+                    value={stats.totalRentals}
+                    icon="🏠"
+                />
+                <StatsCard
+                    title="Total Users"
+                    value={stats.totalUsers}
+                    icon="👥"
+                />
+                <StatsCard
+                    title="Total Vendors"
+                    value={stats.totalVendors}
+                    icon="🏪"
+                />
             </div>
+            <ContentComponent
+                rentals={displayedRentals}
+                userEmail={userEmail}
+            />
         </div>
     );
 }

@@ -1,16 +1,17 @@
-const StatsCard = ({ title, value }) => (
-    <div
-        style={{
-            padding: '20px',
-            border: '1px solid #ccc',
-            borderRadius: '8px',
-            margin: '10px',
-            minWidth: '150px',
-        }}
-    >
-        <h3>{title}</h3>
-        <p>{value}</p>
-    </div>
-);
-
-export default StatsCard;
+export default function StatsCard({ title, value, icon }) {
+    return (
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
+                <div>
+                    <p className="text-sm text-gray-600 mb-1">{title}</p>
+                    <p className="text-2xl font-bold text-gray-900">{value}</p>
+                </div>
+                {icon && (
+                    <span className="p-3 bg-blue-100 rounded-lg text-2xl">
+                        {icon}
+                    </span>
+                )}
+            </div>
+        </div>
+    );
+}

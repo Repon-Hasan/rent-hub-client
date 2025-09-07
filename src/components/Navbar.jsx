@@ -100,7 +100,7 @@ export default function Navbar() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href={`/dashboard/${role}`} className="flex items-center gap-2">
+                <Link href={`/dashboard`} className="flex items-center gap-2">
                   <LayoutDashboard className="w-4 h-4" /> Dashboard
                 </Link>
               </DropdownMenuItem>
