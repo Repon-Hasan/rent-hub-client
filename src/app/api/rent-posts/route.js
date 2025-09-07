@@ -19,12 +19,5 @@ export async function POST(request) {
     } catch (error) {
         return new Response(JSON.stringify({ error: error.message }), { status: 500 });
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 5be7c9a0987938644751d22e17bcf21ac7c524d5
-=======
-}
->>>>>>> 1ceb0c0078312e71d73616eee0dbf1ce90533ee5
+

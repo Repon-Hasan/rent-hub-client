@@ -13,8 +13,6 @@ export async function GET(req, context) {
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 }
-<<<<<<< HEAD
-=======
 
 export async function PUT(req, context) {
   const params = await context.params;
@@ -49,4 +47,4 @@ export async function DELETE(req, context) {
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 }
->>>>>>> 1ceb0c0078312e71d73616eee0dbf1ce90533ee5
+
