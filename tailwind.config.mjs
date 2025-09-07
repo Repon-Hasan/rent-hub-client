@@ -1,6 +1,6 @@
-// tailwind.config.ts 
+// tailwind.config.mjs
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   darkMode: 'class',
   // ...
 }

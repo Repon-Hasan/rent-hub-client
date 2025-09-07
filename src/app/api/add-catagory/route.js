@@ -31,11 +31,15 @@ export async function POST(request) {
 }
 
 export async function GET() {
+    let client;
     try {
-    const categoriesCollection = await dbConnect('categories');
-    const categories = await categoriesCollection.find({}).toArray();
-    return new Response(JSON.stringify(categories), { status: 200 });
+        const dbConn = await dbConnect('categories');
+        client = dbConn.client;
+        const categories = await dbConn.collection.find({}).toArray();
+        client.close();
+        return new Response(JSON.stringify(categories), { status: 200 });
     } catch (error) {
+        if (client) client.close();
         console.error('Error fetching categories:', error);
         return new Response('Internal Server Error', { status: 500 });
     }
