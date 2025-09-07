@@ -37,10 +37,10 @@ export default function DashboardLayout({ children }) {
         return null; 
     }
 
-    const role = session.user?.role || 'user';
+    const role = session.user?.role || 'renter';
     let SidebarComponent = UserSidebar;
     if (role === 'admin') SidebarComponent = AdminSidebar;
-    else if (role === 'vendor') SidebarComponent = VendorSidebar;
+    else if (role === 'woner') SidebarComponent = VendorSidebar;
 
     return (
         <div className="flex min-h-screen bg-gray-100">

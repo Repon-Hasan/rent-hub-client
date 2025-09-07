@@ -49,7 +49,7 @@ export const authOptions = {
             name: user.name,
             email: user.email,
             image: user.image || null,
-            role: "renter", // default role
+            role: "renter", 
             createdAt: new Date(),
           });
         }

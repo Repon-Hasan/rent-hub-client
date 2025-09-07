@@ -27,10 +27,10 @@ export default function AdminSidebar() {
                             pathname === link.href
                                 ? 'bg-blue-100 text-blue-700'
                                 : 'text-gray-700 hover:bg-gray-100'
-                        }`}
+                        }`} 
                     >
                         {link.label}
-                    </Link>
+                    </Link> 
                 ))}
             </nav>
         </div>

@@ -16,7 +16,7 @@ export default function VendorSidebar() {
         <div className="w-64 bg-white shadow-md h-screen flex flex-col">
             <div className="p-4 border-b">
                 <h2 className="text-xl font-bold text-blue-600">
-                    Vendor Panel
+                    Woner Panel
                 </h2>
             </div>
             <nav className="flex-1 p-4 space-y-2">

@@ -18,3 +18,50 @@ export async function POST(req) {
     return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
   }
 }
+
+export async function PATCH(request) {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session || session.user?.role !== 'admin') {
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 401 },
+            );
+        }
+
+        const { email, role } = await request.json();
+        if (!email || !role) {
+            return NextResponse.json(
+                { error: 'Email and role are required' },
+                { status: 400 },
+            );
+        }
+        if (!['renter', 'admin'].includes(role)) {
+            return NextResponse.json(
+                { error: 'Invalid role' },
+                { status: 400 },
+            );
+        }
+
+        const collection = await dbConnect('users');
+        const result = await collection.updateOne(
+            { email },
+            { $set: { role } },
+        );
+
+        if (result.matchedCount === 0) {
+            return NextResponse.json(
+                { error: 'User not found' },
+                { status: 404 },
+            );
+        }
+
+        return NextResponse.json({ message: 'Role updated successfully' });
+    } catch (err) {
+        console.error('Error updating user role:', err);
+        return NextResponse.json(
+            { error: 'Something went wrong' },
+            { status: 500 },
+        );
+    }
+}
