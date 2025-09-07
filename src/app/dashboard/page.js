@@ -1,19 +1,7 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> 5be7c9a0987938644751d22e17bcf21ac7c524d5
 import Header from './components/common/Header';
 import AdminSidebar from './components/admin/Sidebar';
 import VendorSidebar from './components/vendor/Sidebar';
 import UserSidebar from './components/user/Sidebar';
-<<<<<<< HEAD
-import { rentals } from '../data/rentals';
-import Image from 'next/image';
-
-export default function DashboardPage() {
-    const userRole = 'admin'; // পরে auth context থেকে dynamic হবে
-
-=======
 import StatsCard from './components/common/StatsCard';
 import RentalsTable from './components/admin/RentalsTable';
 import Image from 'next/image';
@@ -32,73 +20,11 @@ export default async function DashboardPage({
     const allRentals = await res.json();
 
     // Sidebar component
->>>>>>> 5be7c9a0987938644751d22e17bcf21ac7c524d5
     let SidebarComponent;
     if (userRole === 'admin') SidebarComponent = AdminSidebar;
     else if (userRole === 'vendor') SidebarComponent = VendorSidebar;
     else SidebarComponent = UserSidebar;
 
-<<<<<<< HEAD
-    return (
-        <div style={{ display: 'flex' }}>
-            <SidebarComponent />
-            <div style={{ flex: 1 }}>
-                <Header />
-                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                    <div
-                        style={{
-                            padding: '20px',
-                            border: '1px solid #ccc',
-                            margin: '10px',
-                            borderRadius: '8px',
-                        }}
-                    >
-                        <h3>Total Rentals</h3>
-                        <p>{rentals.length}</p>
-                    </div>
-                    <div
-                        style={{
-                            padding: '20px',
-                            border: '1px solid #ccc',
-                            margin: '10px',
-                            borderRadius: '8px',
-                        }}
-                    >
-                        <h3>Total Users</h3>
-                        <p>100</p>
-                    </div>
-                </div>
-
-                {/* Rentals list */}
-                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                    {rentals.map((rental) => (
-                        <div
-                            key={rental.id}
-                            style={{
-                                border: '1px solid #ccc',
-                                margin: '10px',
-                                padding: '10px',
-                                width: '250px',
-                            }}
-                        >
-                            <img
-                                src={rental.imageUrl}
-                                alt={rental.title}
-                                style={{
-                                    width: '100%',
-                                    height: '150px',
-                                    objectFit: 'cover',
-                                }}
-                            />
-                            <h3>{rental.title}</h3>
-                            <p>
-                                {rental.type} - {rental.location}
-                            </p>
-                            <p>Rent: ৳{rental.rentPrice}</p>
-                        </div>
-                    ))}
-                </div>
-=======
     // Filter rentals per role
     let rentals = [];
     if (userRole === '') {
@@ -165,7 +91,6 @@ export default async function DashboardPage({
                         ))}
                     </div>
                 )}
->>>>>>> 5be7c9a0987938644751d22e17bcf21ac7c524d5
             </div>
         </div>
     );

@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import Link from 'next/link';
 
 const AdminSidebar = () => (
@@ -31,6 +32,8 @@ const AdminSidebar = () => (
 
 export default AdminSidebar;
 =======
+=======
+>>>>>>> development
 import Link from "next/link";
 
 export default function AdminSidebar() {
@@ -55,4 +58,7 @@ export default function AdminSidebar() {
         </div>
     );
 }
+<<<<<<< HEAD
 >>>>>>> 5be7c9a0987938644751d22e17bcf21ac7c524d5
+=======
+>>>>>>> development
