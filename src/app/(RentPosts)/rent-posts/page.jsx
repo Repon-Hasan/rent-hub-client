@@ -135,16 +135,14 @@ const RentPostsPage = () => {
     fetchPosts();
   }, []);
 
-  // Fetch categories from /api/add-catagory
+  // Fetch categories from /api/rent-category
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("/api/add-catagory");
+        const res = await fetch("/api/rent-category");
         if (res.ok) {
           const data = await res.json();
-          // Defensive: handle if data is not array or empty
           if (Array.isArray(data) && data.length > 0) {
-            // Use 'name' property, fallback to _id if missing
             const catNames = ["All", ...data.map((cat) => cat.name ? cat.name : (cat._id || ""))].filter(Boolean);
             setCategories(catNames);
           } else {
@@ -205,6 +203,10 @@ const RentPostsPage = () => {
         {loading ? (
           <div className="w-full flex justify-center items-center py-20">
             <span className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid"></span>
+          </div>
+        ) : filteredPosts.length === 0 ? (
+          <div className="w-full flex justify-center items-center py-20">
+            <span className="text-lg text-gray-500 font-semibold">No post to show for this category.</span>
           </div>
         ) : (
           <RentPostsList posts={filteredPosts} handleDelete={handleDelete} />
