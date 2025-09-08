@@ -1,7 +1,8 @@
+import Banner from "./components/Banner";
 import BecomeOwnerSection from "./components/BecomeOwner";
 import Categories from "./components/Categories";
 import FeaturedListings from "./components/FeaturedListings";
-import Footer from "./components/Footer";
+
 import Newsletter from "./components/Newsletter";
 import PopularListings from "./components/PopularListings";
 import TopRatedListings from "./components/TopRatedListings";
@@ -10,6 +11,7 @@ export default function Home() {
   return (
     <div>
       <main className="mx-auto max-w-7xl">
+        <Banner></Banner>
         <Categories></Categories>
         <FeaturedListings></FeaturedListings>
         <PopularListings></PopularListings>
@@ -17,7 +19,7 @@ export default function Home() {
         <BecomeOwnerSection></BecomeOwnerSection>
         <Newsletter></Newsletter>
       </main>
-      <Footer></Footer>
+      
     </div>
   );
 }

@@ -1,6 +1,15 @@
-// tailwind.config.mjs
 /** @type {import('tailwindcss').Config} */
-export default {
-  darkMode: 'class',
-  // ...
-}
+import daisyui from 'daisyui';
+
+const config = {
+  content: [
+    './app/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}',
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [daisyui],
+};
+
+export default config;
