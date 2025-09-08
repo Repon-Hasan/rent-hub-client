@@ -28,21 +28,24 @@ export const metadata = {
 
 export default async function RootLayout({ children }) {
   const session = await getServerSession(authOptions);
-  const safeSession = session
-      ? {
-            ...session,
-            user: {
-                ...session.user,
-                id: session.user.id.toString(),
-            },
-        }
-      : null;
+//   const safeSession = session
+//       ? {
+//             ...session,
+//             user: {
+//                 ...session.user,
+//                 id: session.user.id.toString(),
+//             },
+//         }
+//       : null;
+
+// session={safeSession}
+
     return (
         <html lang="en" suppressHydrationWarning>
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
-                <SessionProviderWrapper session={safeSession}>
+                <SessionProviderWrapper >
                     <ThemeProvider
                         attribute="class"
                         defaultTheme="system"
