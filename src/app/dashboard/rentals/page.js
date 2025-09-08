@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { CustomButton } from '@/components/ui/CustomButton';
-import { Input } from '@/components/ui/Input';
+import { CustomButton } from '@/app/components/CustomButton';
+import { Input } from '@/app/components/Input';
+// import { Input } from '@app/components/Input';
 import {
     Table,
     TableBody,
@@ -11,34 +10,34 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '@/components/ui/Table';
-import { useToast } from '@/components/ui/useToast';
-import Button from '../components/common/Button';
-import LoadingDashboard from '../components/LoadingDashboard';
+} from '@/app/components/Table';
+import { useToast } from '@/app/components/useToast';
+import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 
 export default function ManageRentals() {
     const { data: session } = useSession();
     const { toast } = useToast();
     const [rentals, setRentals] = useState([]);
+    const [search, setSearch] = useState('');
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
-    const api = process.env.NEXT_PUBLIC_BASE_URL;
-
-    
 
     const fetchRentals = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${api}/api/rent-posts`, {
-                cache: 'no-store',
-            });
-            if (!res.ok) {
-                throw new Error(
-                    `Failed to fetch rentals: ${res.status} ${res.statusText}`,
-                );
-            }
-            const rentals = await res.json(); 
-            console.log('rentals', rentals);
-            setRentals(rentals);
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_BASE_URL}/api/rent-posts`,
+                { cache: 'no-store' },
+            );
+            if (!res.ok) throw new Error('Failed to fetch rentals');
+
+            const data = await res.json();
+            console.log('data from API:', data); 
+
+            setRentals(data || []); // rentals array
+            setTotalPages(data.totalPages || 1);
         } catch (error) {
             console.error('Error fetching rentals:', error);
             toast({
@@ -51,17 +50,21 @@ export default function ManageRentals() {
         }
     };
 
+
     useEffect(() => {
         if (session?.user?.role === 'admin') fetchRentals();
-    }, [session]);
+    }, [session, page, search]);
 
     const handleAction = async (id, action) => {
         try {
-            const res = await fetch(`${api}/api/rent-posts/${id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action }),
-            });
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_BASE_URL}/api/rent-posts/${id}`,
+                {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action }),
+                },
+            );
             if (!res.ok) {
                 throw new Error(
                     `Failed to ${action} rental: ${res.status} ${res.statusText}`,
@@ -82,9 +85,12 @@ export default function ManageRentals() {
     const handleDelete = async (id) => {
         if (!confirm('Are you sure you want to delete this rental?')) return;
         try {
-            const res = await fetch(`${api}/api/rent-posts/${id}`, {
-                method: 'DELETE',
-            });
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_BASE_URL}/api/rent-posts/${id}`,
+                {
+                    method: 'DELETE',
+                },
+            );
             if (!res.ok) {
                 throw new Error(
                     `Failed to delete rental: ${res.status} ${res.statusText}`,
@@ -107,129 +113,85 @@ export default function ManageRentals() {
     }
 
     if (loading) {
-        return <LoadingDashboard/>;
+        return <div className="text-center p-6">Loading Rentals...</div>;
     }
 
     return (
-        <div className="bg-white rounded-xl shadow-sm overflow-x-auto">
-            <h1 className="text-2xl font-bold mb-4">Manage Rentals</h1>
+        <div className="container mx-auto p-6">
+            <h1 className="text-2xl font-bold mb-4">
+                Custom Rentals Management
+            </h1>
             <div className="mb-4">
-                {/* <Input
+                <Input
                     placeholder="Search by title or email..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="max-w-md"
-                /> */}
+                />
             </div>
-            <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                    <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Title
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Location
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Price
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Status
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Actions
-                        </th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Title</TableHead>
+                        <TableHead>User Email</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Actions</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
                     {rentals.map((rental) => (
-                        <tr key={rental._id}>
-                            <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                                {rental.title}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-500">
-                                {rental.location}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-900">
-                                ৳{rental.rentPrice}
-                            </td>
-                            <td className="px-6 py-4 text-sm">
-                                <span
-                                    className={`px-2 py-1 rounded-full text-xs ${
-                                        rental.status === 'approved'
-                                            ? 'bg-green-100 text-green-800'
-                                            : rental.status === 'rejected'
-                                            ? 'bg-red-100 text-red-800'
-                                            : 'bg-yellow-100 text-yellow-800'
-                                    }`}
-                                >
-                                    {rental.status}
-                                </span>
-                            </td>
-
-                            <td className="px-6 py-4 text-sm space-x-2">
-                                <Button className='cursor-pointer'
-                                    variant="primary"
+                        <TableRow className="text-gray-700" key={rental._id}>
+                            <TableCell>{rental.title}</TableCell>
+                            <TableCell>{rental.email}</TableCell>
+                            <TableCell>{rental.status}</TableCell>
+                            <TableCell>
+                                <CustomButton
                                     onClick={() =>
                                         handleAction(rental._id, 'approve')
                                     }
                                     disabled={rental.status === 'approved'}
+                                    className="mr-2"
                                 >
                                     Approve
-                                </Button>
-                                <Button className='btn-sm text-sm cursor-pointer'
+                                </CustomButton>
+                                <CustomButton
                                     onClick={() =>
                                         handleAction(rental._id, 'reject')
                                     }
                                     disabled={rental.status === 'rejected'}
-                                    variant="danger"
+                                    variant="outline"
+                                    className="mr-2"
                                 >
                                     Reject
-                                </Button>
-                                <Button className='cursor-pointer'
+                                </CustomButton>
+                                <CustomButton
                                     onClick={() => handleDelete(rental._id)}
-                                    variant="danger"
+                                    variant="destructive"
                                 >
                                     Delete
-                                </Button>
-                            </td>
-                        </tr>
+                                </CustomButton>
+                            </TableCell>
+                        </TableRow>
                     ))}
-                </tbody>
-            </table>
-            {/* {totalPages > 1 && (
-                <div className="p-4 flex justify-between items-center bg-gray-50">
-                    <div className="text-sm text-gray-600">
-                        Showing {indexOfFirstItem + 1} to{' '}
-                        {Math.min(indexOfLastItem, rentals.length)} of{' '}
-                        {rentals.length}
-                    </div>
-                    <div className="flex space-x-2">
-                        <Button
-                            onClick={() =>
-                                setCurrentPage((prev) => Math.max(prev - 1, 1))
-                            }
-                            disabled={currentPage === 1}
-                        >
-                            Previous
-                        </Button>
-                        <Button
-                            onClick={() =>
-                                setCurrentPage((prev) =>
-                                    Math.min(prev + 1, totalPages),
-                                )
-                            }
-                            disabled={currentPage === totalPages}
-                        >
-                            Next
-                        </Button>
-                    </div>
-                </div>
-            )} */}
+                </TableBody>
+            </Table>
+            <div className="flex justify-between mt-4">
+                <CustomButton
+                    disabled={page === 1}
+                    onClick={() => setPage(page - 1)}
+                >
+                    Previous
+                </CustomButton>
+                <span>
+                    Page {page} of {totalPages}
+                </span>
+                <CustomButton
+                    disabled={page === totalPages}
+                    onClick={() => setPage(page + 1)}
+                >
+                    Next
+                </CustomButton>
+            </div>
         </div>
     );
 }
-
-
-
-;

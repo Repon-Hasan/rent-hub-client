@@ -4,6 +4,8 @@ import { ThemeProvider } from '@/Providers/ThemeProvider';
 import Footer from './components/Footer';
 import Navbar from './components/Navbar';
 import './globals.css';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/authOptions';
 
 export const metadata = {
     title: 'Create Next App',
@@ -24,19 +26,12 @@ export default async function RootLayout({ children }) {
     return (
         <html lang="en" suppressHydrationWarning>
             <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
                 <SessionProviderWrapper session={safeSession}>
-                    <ThemeProvider
-                        attribute="class"
-                        defaultTheme="system"
-                        enableSystem
-                        disableTransitionOnChange
-                    >
+                  
                         <Navbar />
                         <NextAuthProvider>{children}</NextAuthProvider>
                         <Footer />
-                    </ThemeProvider>
                 </SessionProviderWrapper>
             </body>
         </html>
