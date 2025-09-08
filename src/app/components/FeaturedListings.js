@@ -6,11 +6,17 @@ import ListingCard from './ListingCard';
 export default function FeaturedListings() {
   const [listings, setListings] = useState([]);
 <<<<<<< HEAD
+<<<<<<< HEAD
   const api = process.env.NEXT_PUBLIC_BASE_URL;
 =======
   const [isLoading, setIsLoading] = useState(true);
 
 >>>>>>> 5358e810e02d460f3077cdab9618d35e9c3cddd1
+=======
+  const api = process.env.NEXT_PUBLIC_BASE_URL;
+  const [isLoading, setIsLoading] = useState(true);
+
+>>>>>>> 44e2e1644d7ac8c27a83cbc507d110d1ccec6930
   useEffect(() => {
     fetch(`${api}/api/rent-posts?featured=true`)
       .then(res => res.json())
@@ -63,6 +69,9 @@ export default function FeaturedListings() {
 
   return (
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 44e2e1644d7ac8c27a83cbc507d110d1ccec6930
       <section className="py-12">
           <h2 className="text-3xl font-bold text-center mb-8 text-base-content dark:text-base-content">
               Featured Listings
@@ -85,6 +94,7 @@ export default function FeaturedListings() {
               )}
           </div>
       </section>
+<<<<<<< HEAD
 =======
     <section className="py-12">
       <h2 className="mb-8 text-3xl font-bold text-center text-base-content">
@@ -105,5 +115,8 @@ export default function FeaturedListings() {
       </div>
     </section>
 >>>>>>> 5358e810e02d460f3077cdab9618d35e9c3cddd1
+=======
+
+>>>>>>> 44e2e1644d7ac8c27a83cbc507d110d1ccec6930
   );
 }

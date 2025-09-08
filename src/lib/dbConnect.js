@@ -1,9 +1,16 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { MongoClient, ServerApiVersion }  from 'mongodb';
 const uri = process.env.MONGODB_URI;
 =======
 import { MongoClient, ServerApiVersion } from 'mongodb';
 >>>>>>> 5358e810e02d460f3077cdab9618d35e9c3cddd1
+=======
+
+import { MongoClient, ServerApiVersion }  from 'mongodb';
+const uri = process.env.MONGODB_URI;
+
+>>>>>>> 44e2e1644d7ac8c27a83cbc507d110d1ccec6930
 
 const uri = process.env.MONGODB_URI; 
 
