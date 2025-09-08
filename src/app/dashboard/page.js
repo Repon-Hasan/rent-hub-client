@@ -2,8 +2,8 @@
 
 import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
-import StatsCard from './components/common/StatsCard'; // Path adjust
-import AdminContent from './components/admin/DashboardContent'; // Fixed typo
+import StatsCard from './components/common/StatsCard'; 
+import AdminContent from './components/admin/DashboardContent'; 
 import VendorContent from './components/vendor/DashboardContent';
 import UserContent from './components/user/DashboardContent';
 import LoadingDashboard from './components/LoadingDashboard';

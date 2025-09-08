@@ -23,6 +23,8 @@ export default function ManageRentals() {
     const [loading, setLoading] = useState(true);
     const api = process.env.NEXT_PUBLIC_BASE_URL;
 
+    
+
     const fetchRentals = async () => {
         setLoading(true);
         try {
@@ -34,7 +36,7 @@ export default function ManageRentals() {
                     `Failed to fetch rentals: ${res.status} ${res.statusText}`,
                 );
             }
-            const rentals = await res.json(); // Array expected
+            const rentals = await res.json(); 
             console.log('rentals', rentals);
             setRentals(rentals);
         } catch (error) {

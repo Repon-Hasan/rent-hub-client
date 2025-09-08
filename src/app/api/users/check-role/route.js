@@ -1,5 +1,9 @@
 import clientPromise from "@/lib/mongodb";
 import { NextResponse } from "next/server";
+import dbConnect from '@/lib/dbConnect';
+import { ObjectId } from 'mongodb';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/authOptions';
 
 export async function POST(req) {
   try {
@@ -19,49 +23,75 @@ export async function POST(req) {
   }
 }
 
-export async function PATCH(request) {
+export async function PATCH(req) {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user?.role !== 'admin') {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
-        const session = await getServerSession(authOptions);
-        if (!session || session.user?.role !== 'admin') {
+        const { id, role } = await req.json();
+        if (!id || !role)
             return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 },
-            );
-        }
-
-        const { email, role } = await request.json();
-        if (!email || !role) {
-            return NextResponse.json(
-                { error: 'Email and role are required' },
+                { error: 'ID and role are required' },
                 { status: 400 },
             );
-        }
-        if (!['renter', 'admin'].includes(role)) {
-            return NextResponse.json(
-                { error: 'Invalid role' },
-                { status: 400 },
-            );
-        }
 
-        const collection = await dbConnect('users');
+        const { client, collection } = await dbConnect('users');
         const result = await collection.updateOne(
-            { email },
+            { _id: new ObjectId(id) },
             { $set: { role } },
         );
+        await client.close();
 
-        if (result.matchedCount === 0) {
+        if (result.matchedCount === 0)
             return NextResponse.json(
                 { error: 'User not found' },
                 { status: 404 },
             );
-        }
-
         return NextResponse.json({ message: 'Role updated successfully' });
     } catch (err) {
-        console.error('Error updating user role:', err);
+        console.error(err);
         return NextResponse.json(
             { error: 'Something went wrong' },
             { status: 500 },
         );
     }
 }
+
+// export async function DELETE(req) {
+//     try {
+//         const session = await getServerSession(authOptions);
+//         if (!session || session.user?.role !== 'admin') {
+//             return NextResponse.json(
+//                 { error: 'Unauthorized' },
+//                 { status: 401 },
+//             );
+//         }
+
+//         const url = new URL(req.url);
+//         const id = url.searchParams.get('id');
+//         if (!id)
+//             return NextResponse.json(
+//                 { error: 'ID is required' },
+//                 { status: 400 },
+//             );
+
+//         const { collection } = await dbConnect('users');
+//         const result = await collection.deleteOne({ _id: new ObjectId(id) });
+
+//         if (result.deletedCount === 0)
+//             return NextResponse.json(
+//                 { error: 'User not found' },
+//                 { status: 404 },
+//             );
+
+//         return NextResponse.json({ message: 'User deleted successfully' });
+//     } catch (err) {
+//         console.error(err);
+//         return NextResponse.json(
+//             { error: 'Something went wrong' },
+//             { status: 500 },
+//         );
+//     }
+// }

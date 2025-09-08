@@ -1,5 +1,5 @@
 import { MongoClient, ServerApiVersion }  from 'mongodb';
-const uri = process.env.MONGO_URI;
+const uri = process.env.MONGODB_URI;
 
 
 async function dbConnect(collection) {

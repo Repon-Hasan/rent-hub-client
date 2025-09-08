@@ -33,7 +33,7 @@ export default async function RootLayout({ children }) {
             ...session,
             user: {
                 ...session.user,
-                id: session.user.id.toString(),
+                id: session?.user?.id ? session.user.id.toString() : null,
             },
         }
       : null;
