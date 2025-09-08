@@ -37,7 +37,7 @@ const EditRentPostsPage = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await fetch("/api/add-catagory");
+                const res = await fetch("/api/add-category");
                 if (res.ok) {
                     const data = await res.json();
                     setCategories(data);

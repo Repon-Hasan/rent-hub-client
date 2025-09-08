@@ -2,6 +2,7 @@ import React from "react";
 import AIInsights from "./AIInsights";
 
 import { notFound } from "next/navigation";
+import Link from "next/link";
 
 function formatDate(dateStr) {
   const date = new Date(dateStr);
@@ -111,17 +112,14 @@ const DetailPage = async (props) => {
           ></iframe>
         </div>
         <div className="flex gap-4 mt-8">
-          <button className="bg-blue-600 text-white px-5 font-semibold py-3 rounded-xl text-lg hover:bg-blue-700 transition">
-            Book Now
-          </button>
+          <Link href={`/checkout/${post.id}`}>
+            <button className="bg-blue-600 text-white px-5 font-semibold py-3 rounded-xl text-lg hover:bg-blue-700 transition">
+              Book Now
+            </button>
+          </Link>
           <button className=" bg-gray-200 px-5 text-gray-800 font-semibold py-3 rounded-xl text-lg hover:bg-gray-300 transition">
             Contact Host
           </button>
-          <a href={`/edit-rent-posts/${post.id}`}>
-            <button className="bg-yellow-500 text-white px-5 font-semibold py-3 rounded-xl text-lg hover:bg-yellow-600 transition">
-              Edit
-            </button>
-          </a>
         </div>
       </section>
     </div>

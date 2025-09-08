@@ -16,6 +16,7 @@ export async function POST(request) {
     const text = result?.response?.candidates?.[0]?.content?.parts?.[0]?.text || null;
     return NextResponse.json({ text });
   } catch (err) {
+    console.error("Gemini API error:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

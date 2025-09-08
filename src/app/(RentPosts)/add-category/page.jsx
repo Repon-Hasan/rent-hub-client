@@ -15,7 +15,7 @@ const AddCategoryPage = () => {
     // Fetch categories from DB
     const fetchCategories = async () => {
         try {
-            const res = await fetch("/api/add-catagory");
+            const res = await fetch("/api/add-category");
             if (res.ok) {
                 const data = await res.json();
                 setCategories(data);
@@ -64,7 +64,7 @@ const AddCategoryPage = () => {
         }
         setLoading(true);
         try {
-            const res = await fetch("/api/add-catagory", {
+            const res = await fetch("/api/add-category", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name, subcategories, imageUrl }),

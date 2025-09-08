@@ -3,17 +3,18 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setIsLoading(true);
 
     const res = await signIn("credentials", {
       redirect: false,
@@ -21,25 +22,29 @@ export default function LoginPage() {
       password,
     });
 
+    setIsLoading(false);
+
     if (res?.error) {
-      setError(res.error);
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: res.error,
+      });
     } else {
       router.push("/"); // redirect after login
     }
   };
 
   const handleGoogleSignIn = async () => {
+    setIsLoading(true);
     await signIn("google", { callbackUrl: "/" });
+    setIsLoading(false);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="max-w-md w-full p-6 bg-white rounded-2xl shadow space-y-4">
         <h2 className="text-2xl font-bold text-center">Login</h2>
-
-        {error && (
-          <div className="text-red-500 text-center">{error}</div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -69,8 +74,8 @@ export default function LoginPage() {
             </button>
           </div>
 
-          <button type="submit" className="btn btn-primary w-full">
-            Login
+          <button type="submit" className="btn btn-primary w-full" disabled={isLoading}>
+            {isLoading ? "Logging in..." : "Login"}
           </button>
         </form>
 
@@ -79,6 +84,7 @@ export default function LoginPage() {
         <button
           onClick={handleGoogleSignIn}
           className="btn btn-outline btn-primary w-full"
+          disabled={isLoading}
         >
           Continue with Google
         </button>

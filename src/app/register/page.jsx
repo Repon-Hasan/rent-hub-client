@@ -3,16 +3,19 @@
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { signIn } from "next-auth/react";
+import Swal from "sweetalert2";
 
 export default function RegisterPage() {
   const { register, handleSubmit } = useForm();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (data) => {
-    console.log("Form submitted!", data); // debug log
-
-    // default role renter
+    setIsLoading(true);
+    
+    // Default role is "renter"
     data.role = "renter";
 
     try {
@@ -22,19 +25,55 @@ export default function RegisterPage() {
         body: JSON.stringify(data),
       });
 
-      console.log("Response status:", res.status);
-
       if (res.ok) {
-        alert("Registration successful! Redirecting to login...");
-        router.push("/login");
+        Swal.fire({
+          icon: "success",
+          title: "Registration Successful!",
+          text: "You can now log in to your account.",
+          confirmButtonText: "Go to Login",
+        }).then(() => {
+          router.push("/login");
+        });
       } else {
         const err = await res.json().catch(() => ({}));
-        alert(err.message || "Registration failed");
+        
+        // This is the new logic for handling existing users
+        if (err.message === "Email already exists" || err.message === "Phone number already exists") {
+          Swal.fire({
+            icon: "info",
+            title: "Already Registered",
+            text: `${err.message}. Do you want to go to the login page?`,
+            showCancelButton: true,
+            confirmButtonText: "Go to Login",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              router.push("/login");
+            }
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Registration Failed",
+            text: err.message || "Something went wrong. Please try again.",
+          });
+        }
       }
     } catch (error) {
       console.error("Registration error:", error);
-      alert("Something went wrong!");
+      Swal.fire({
+        icon: "error",
+        title: "Something Went Wrong!",
+        text: "Please check your network and try again.",
+      });
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    await signIn("google", { callbackUrl: "/" });
+    setIsLoading(false);
   };
 
   return (
@@ -112,10 +151,20 @@ export default function RegisterPage() {
         </div>
 
         {/* Submit Button */}
-        <button type="submit" className="btn btn-primary w-full">
-          Register
+        <button type="submit" className="btn btn-primary w-full" disabled={isLoading}>
+          {isLoading ? "Registering..." : "Register"}
         </button>
       </form>
+
+      <div className="divider">OR</div>
+
+      <button
+        onClick={handleGoogleSignIn}
+        className="btn btn-outline btn-primary w-full"
+        disabled={isLoading}
+      >
+        Continue with Google
+      </button>
     </div>
   );
 }

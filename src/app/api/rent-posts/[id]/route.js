@@ -1,6 +1,5 @@
 // import dbConnect from "@/lib/dbConnect";
 // import { ObjectId } from "mongodb";
-
 // export async function GET(req, context) {
 //   const params = await context.params;
 //   const { id } = params;
@@ -48,13 +47,10 @@
 //   }
 // }
 
-
-
-
-import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/authOptions';
 import dbConnect from '@/lib/dbConnect';
 import { ObjectId } from 'mongodb';
+import { getServerSession } from 'next-auth/next';
 
 export async function GET(req, { params }) {
     try {
@@ -129,9 +125,9 @@ export async function PATCH(req, { params }) {
             status: 200,
         });
     } catch (error) {
-        console.error(`Error ${action}ing rental:`, error);
+        console.error(`Error ${action || 'updating'} rental:`, error);
         return new Response(
-            JSON.stringify({ error: `Failed to ${action} rental` }),
+            JSON.stringify({ error: `Failed to ${action || 'update'} rental` }),
             { status: 500 },
         );
     }

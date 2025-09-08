@@ -11,7 +11,9 @@ async function dbConnect(collection) {
       }
     });
     await client.connect();
-    return client.db(process.env.DB_NAME).collection(collection);
+    const db = client.db(process.env.DB_NAME);
+    const coll = db.collection(collection);
+    return { client, collection: coll };
 }
 
 export default dbConnect;
