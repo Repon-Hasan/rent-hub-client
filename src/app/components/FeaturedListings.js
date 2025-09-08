@@ -5,20 +5,64 @@ import ListingCard from './ListingCard';
 
 export default function FeaturedListings() {
   const [listings, setListings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/rent-posts?featured=true')
       .then(res => res.json())
-      .then(data => setListings(data))
-      .catch(() => setListings([]));
+      .then(data => {
+        // The most likely cause of the error is that the API response is an object
+        // containing the listings array, e.g., { listings: [...] }.
+        // This line checks for that and safely sets the state.
+        const listingsArray = data.listings || data;
+        
+        if (Array.isArray(listingsArray)) {
+          setListings(listingsArray);
+        } else {
+          console.error("Fetched data is not an array:", listingsArray);
+          setListings([]);
+        }
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch featured listings:", error);
+        setListings([]);
+        setIsLoading(false);
+      });
   }, []);
+
+  if (isLoading) {
+    return (
+      <section className="py-12 text-center">
+        <h2 className="mb-8 text-3xl font-bold text-base-content">
+          Featured Listings
+        </h2>
+        <div className="flex items-center justify-center h-48">
+          <span className="loading loading-spinner loading-lg text-primary"></span>
+        </div>
+      </section>
+    );
+  }
+
+  if (listings.length === 0) {
+    return (
+      <section className="py-12 text-center">
+        <h2 className="mb-8 text-3xl font-bold text-base-content">
+          Featured Listings
+        </h2>
+        <div className="p-8 text-center text-gray-500">
+          <p>No featured listings are available at the moment.</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-12">
-      <h2 className="text-3xl font-bold text-center mb-8 text-base-content dark:text-base-content">
+      <h2 className="mb-8 text-3xl font-bold text-center text-base-content">
         Featured Listings
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {listings.map(listing => (
           <ListingCard
             key={listing._id}
