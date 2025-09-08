@@ -117,55 +117,6 @@ const RentPostsPage = () => {
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [categories, setCategories] = useState(["All"]);
 
-    useEffect(() => {
-        async function fetchPosts() {
-            setLoading(true);
-            
-            // Conditionally build the API URL with the search query
-            const url = searchQuery 
-                ? `/api/rent-posts?search=${encodeURIComponent(searchQuery)}` 
-                : '/api/rent-posts';
-
-            const res = await fetch(url, { cache: "no-store" });
-            
-            if (!res.ok) {
-                setPosts([]);
-                setLoading(false);
-                return;
-            }
-            setPosts(await res.json());
-            setLoading(false);
-        }
-        
-        // This effect will now re-run whenever the search query in the URL changes
-        fetchPosts();
-    }, [searchQuery]); 
-
-  // Fetch categories from /api/add-catagory
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch("/api/add-catagory");
-        if (res.ok) {
-          const data = await res.json();
-          // Defensive: handle if data is not array or empty
-          if (Array.isArray(data) && data.length > 0) {
-            // Use 'name' property, fallback to _id if missing
-            const catNames = ["All", ...data.map((cat) => cat.name ? cat.name : (cat._id || ""))].filter(Boolean);
-            setCategories(catNames);
-          } else {
-            setCategories(["All"]);
-          }
-        } else {
-          setCategories(["All"]);
-        }
-      } catch (err) {
-        setCategories(["All"]);
-      }
-    };
-    fetchCategories();
-  }, []);
-
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this post?")) return;
         const res = await fetch(`/api/rent-posts/${id}`, { method: "DELETE" });
@@ -176,48 +127,8 @@ const RentPostsPage = () => {
             alert("Delete failed.");
         }
     };
-
-    // Filter posts by selected category
-    const filteredPosts =
-        selectedCategory === "All"
-            ? posts
-            : posts.filter((p) => p.category === selectedCategory);
-
-  return (
-    <div className="min-h-screen w-full bg-white flex flex-col py-12">
-      <h1 className="text-center mb-8 text-4xl font-bold text-gray-900 tracking-wide font-sans">
-        All Rent Posts
-      </h1>
-      <div className="w-full flex justify-left mb-8 ml-8">
-        <div className="w-full max-w-xs">
-          <label htmlFor="category" className="block mb-2 text-sm font-medium text-gray-700">
-            Filter by Category
-          </label>
-          <select
-            id="category"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="block w-full px-4 py-2 text-base border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 shadow-sm"
-          >
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
         </div>
-      </div>
-      <Suspense fallback={<div className="w-full flex justify-center items-center py-20"><span className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid"></span></div>}>
-        {loading ? (
-          <div className="w-full flex justify-center items-center py-20">
-            <span className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid"></span>
-          </div>
-        ) : (
-          <RentPostsList posts={filteredPosts} handleDelete={handleDelete} />
-        )}
-      </Suspense>
-    </div>
-  );
+    );
 };
 
 export default RentPostsPage;
