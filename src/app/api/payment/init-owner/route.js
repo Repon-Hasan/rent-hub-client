@@ -4,33 +4,33 @@ import clientPromise from "@/lib/mongodb";
 export async function POST(req) {
   try {
     const { email } = await req.json();
-    if (!email) return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    if (!email)
+      return NextResponse.json({ error: "Email is required" }, { status: 400 });
 
     const is_live = process.env.SSLCZ_IS_LIVE === "true";
 
     const tran_id = `txn_${Date.now()}`;
-const data = {
-  store_id: process.env.SSLCZ_STORE_ID,
-  store_passwd: process.env.SSLCZ_STORE_PASS,
-  total_amount: 500,
-  currency: "BDT",
-  tran_id,
-  success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/payment/success`,
-  fail_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/payment/fail`,
-  cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/become-owner`,
-  cus_name: "Customer",
-  cus_email: email,
-  cus_add1: "House 123, Road 45",  // ✅ must not be empty
-  cus_city: "Dhaka",
-  cus_country: "Bangladesh",
-  cus_phone: "01700000000",
-  cus_postcode: "1320",
-  product_name: "Owner Upgrade",
-  product_category: "Subscription",
-  product_profile: "general",
-  shipping_method: "NO",
-};
-
+    const data = {
+      store_id: process.env.SSLCZ_STORE_ID,
+      store_passwd: process.env.SSLCZ_STORE_PASS,
+      total_amount: 500,
+      currency: "BDT",
+      tran_id,
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/payment/success`,
+      fail_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/payment/fail`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/become-owner`,
+      cus_name: "Customer",
+      cus_email: email,
+      cus_add1: "House 123, Road 45",
+      cus_city: "Dhaka",
+      cus_country: "Bangladesh",
+      cus_phone: "01700000000",
+      cus_postcode: "1320",
+      product_name: "Owner Upgrade",
+      product_category: "Subscription",
+      product_profile: "general",
+      shipping_method: "NO",
+    };
 
     // Save pending payment
     const client = await clientPromise;
@@ -57,7 +57,10 @@ const data = {
 
     const result = JSON.parse(text);
     if (!result?.GatewayPageURL)
-      return NextResponse.json({ error: "Gateway URL not found", result }, { status: 500 });
+      return NextResponse.json(
+        { error: "Gateway URL not found", result },
+        { status: 500 }
+      );
 
     return NextResponse.json({ url: result.GatewayPageURL });
   } catch (err) {

@@ -1,14 +1,7 @@
 "use client";
 import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-
-async function getRentPosts() {
-  const res = await fetch("http://localhost:3000/api/rent-posts", {
-    cache: "no-store",
-  });
-  if (!res.ok) return [];
-  return await res.json();
-}
+import { useSearchParams } from "next/navigation"; // New import
 
 function formatDate(dateStr) {
   const date = new Date(dateStr);
@@ -25,33 +18,33 @@ function formatDate(dateStr) {
   return `${day}${suffix} ${month} ${year}`;
 }
 const RentPostsList = ({ posts, handleDelete }) => (
-  <div className="w-full mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 px-2 sm:px-3">
+  <div className="grid w-full grid-cols-1 gap-4 px-2 mx-auto sm:grid-cols-2 lg:grid-cols-5 sm:px-3">
     {posts.map((post) => (
       <div key={post._id} className="flex flex-col bg-white rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 cursor-pointer overflow-hidden mx-auto">
         <Link href={`/rent-posts/${post._id}`} className="no-underline text-inherit">
           <img
             src={post.imageUrl}
             alt={post.title}
-            className="w-full h-36 object-cover rounded-t-xl"
+            className="object-cover w-full h-36 rounded-t-xl"
           />
           <div className="flex flex-row gap-1 px-3 pt-2">
-            <span className="bg-gray-100 text-gray-700 text-xs font-semibold px-2 py-1 rounded-lg">
+            <span className="px-2 py-1 text-xs font-semibold text-gray-700 bg-gray-100 rounded-lg">
               {post.category}
             </span>
             {post.subcategory && (
-              <span className="bg-gray-50 text-gray-500 text-xs font-medium px-2 py-1 rounded-lg">
+              <span className="px-2 py-1 text-xs font-medium text-gray-500 rounded-lg bg-gray-50">
                 {post.subcategory}
               </span>
             )}
           </div>
           <div className="flex flex-col gap-1 p-3">
-            <div className="text-xs text-gray-500 mb-0 font-medium truncate">
+            <div className="mb-0 text-xs font-medium text-gray-500 truncate">
               {post.location}
             </div>
-            <h2 className="text-base font-bold text-gray-900 mb-0 leading-tight truncate">
+            <h2 className="mb-0 text-base font-bold leading-tight text-gray-900 truncate">
               {post.title}
             </h2>
-            <p className="text-xs text-gray-700 mb-1 leading-snug line-clamp-2">
+            <p className="mb-1 text-xs leading-snug text-gray-700 line-clamp-2">
               {post.description}
             </p>
             <div className="flex items-center gap-1 mb-1">
@@ -73,7 +66,7 @@ const RentPostsList = ({ posts, handleDelete }) => (
                 {formatDate(post.availableTo)}
               </span>
             </div>
-            <div className="text-base font-extrabold text-blue-700 mb-1">
+            <div className="mb-1 text-base font-extrabold text-blue-700">
               ৳
               {typeof post.rentPrice === "number"
                 ? post.rentPrice.toLocaleString()
@@ -86,7 +79,7 @@ const RentPostsList = ({ posts, handleDelete }) => (
             </div>
           </div>
         </Link>
-        <div className="flex flex-row gap-2 w-full px-3 pb-3">
+        <div className="flex flex-row w-full gap-2 px-3 pb-3">
           <Link href={`/rent-posts/${post._id}`} className="w-1/2">
             <span className="w-full bg-blue-600 text-white font-semibold py-1.5 rounded-xl text-sm hover:bg-blue-700 transition flex items-center justify-center cursor-pointer">
               View Detail
@@ -115,34 +108,49 @@ const RentPostsList = ({ posts, handleDelete }) => (
 );
 
 const RentPostsPage = () => {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [categories, setCategories] = useState(["All"]);
+    // Read the search parameter from the URL
+    const searchParams = useSearchParams();
+    const searchQuery = searchParams.get('search');
+    
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedCategory, setSelectedCategory] = useState("All");
+    const [categories, setCategories] = useState(["All"]);
 
-  useEffect(() => {
-    async function fetchPosts() {
-      setLoading(true);
-      const res = await fetch("/api/rent-posts", { cache: "no-store" });
-      if (!res.ok) {
-        setPosts([]);
-        setLoading(false);
-        return;
-      }
-      setPosts(await res.json());
-      setLoading(false);
-    }
-    fetchPosts();
-  }, []);
+    useEffect(() => {
+        async function fetchPosts() {
+            setLoading(true);
+            
+            // Conditionally build the API URL with the search query
+            const url = searchQuery 
+                ? `/api/rent-posts?search=${encodeURIComponent(searchQuery)}` 
+                : '/api/rent-posts';
 
-  // Fetch categories from /api/rent-category
+            const res = await fetch(url, { cache: "no-store" });
+            
+            if (!res.ok) {
+                setPosts([]);
+                setLoading(false);
+                return;
+            }
+            setPosts(await res.json());
+            setLoading(false);
+        }
+        
+        // This effect will now re-run whenever the search query in the URL changes
+        fetchPosts();
+    }, [searchQuery]); 
+
+  // Fetch categories from /api/add-catagory
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("/api/rent-category");
+        const res = await fetch("/api/add-catagory");
         if (res.ok) {
           const data = await res.json();
+          // Defensive: handle if data is not array or empty
           if (Array.isArray(data) && data.length > 0) {
+            // Use 'name' property, fallback to _id if missing
             const catNames = ["All", ...data.map((cat) => cat.name ? cat.name : (cat._id || ""))].filter(Boolean);
             setCategories(catNames);
           } else {
@@ -158,22 +166,22 @@ const RentPostsPage = () => {
     fetchCategories();
   }, []);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this post?")) return;
-    const res = await fetch(`/api/rent-posts/${id}`, { method: "DELETE" });
-    if (res.ok) {
-      setPosts((prev) => prev.filter((p) => p._id !== id));
-      alert("Deleted successfully!");
-    } else {
-      alert("Delete failed.");
-    }
-  };
+    const handleDelete = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this post?")) return;
+        const res = await fetch(`/api/rent-posts/${id}`, { method: "DELETE" });
+        if (res.ok) {
+            setPosts((prev) => prev.filter((p) => p._id !== id));
+            alert("Deleted successfully!");
+        } else {
+            alert("Delete failed.");
+        }
+    };
 
-  // Filter posts by selected category
-  const filteredPosts =
-    selectedCategory === "All"
-      ? posts
-      : posts.filter((p) => p.category === selectedCategory);
+    // Filter posts by selected category
+    const filteredPosts =
+        selectedCategory === "All"
+            ? posts
+            : posts.filter((p) => p.category === selectedCategory);
 
   return (
     <div className="min-h-screen w-full bg-white flex flex-col py-12">
@@ -203,10 +211,6 @@ const RentPostsPage = () => {
         {loading ? (
           <div className="w-full flex justify-center items-center py-20">
             <span className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid"></span>
-          </div>
-        ) : filteredPosts.length === 0 ? (
-          <div className="w-full flex justify-center items-center py-20">
-            <span className="text-lg text-gray-500 font-semibold">No post to show for this category.</span>
           </div>
         ) : (
           <RentPostsList posts={filteredPosts} handleDelete={handleDelete} />
