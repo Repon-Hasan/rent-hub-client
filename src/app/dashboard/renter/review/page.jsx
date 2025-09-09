@@ -132,16 +132,21 @@ const RenterReviewPage = () => {
         return `${day}${getOrdinal(day)} ${month} ${year}`;
     };
 
+    // Filter bookings to those not reviewed yet
+    const toReview = bookings.filter(b => !reviewedPostIds.includes(b.postId));
     return (
         <div className="max-w-3xl mx-auto py-8">
             <h1 className="text-2xl font-bold mb-6 text-center">My Booking Reviews</h1>
             {bookings.length === 0 ? (
                 <div className="text-center text-gray-500">No bookings found.</div>
+            ) : toReview.length === 0 ? (
+                <div className="text-center text-base-content py-16">
+                    <h2 className="text-xl font-semibold mb-2">No product to review</h2>
+                    <p className="text-gray-500">You have already reviewed all your booked products. Thank you for sharing your feedback!</p>
+                </div>
             ) : (
                 <div className="space-y-8">
-                    {bookings.map((booking) => {
-                        // Hide review form if already reviewed
-                        if (reviewedPostIds.includes(booking.postId)) return null;
+                    {toReview.map((booking) => {
                         const review = reviewInputs[booking._id || booking.id] || { text: "", rating: 0 };
                         return (
                             <div key={booking._id || booking.id} className="bg-base-100 rounded-2xl shadow-lg p-8 border border-base-200">
