@@ -6,9 +6,9 @@ import { usePathname } from 'next/navigation';
 export default function VendorSidebar() {
     const pathname = usePathname();
     const links = [
-        { href: '/dashboard', label: 'Dashboard' },
-        { href: '/dashboard/add', label: 'Add Rental' },
-        { href: '/dashboard/rentals', label: 'All Rentals' },
+        { href: '/dashboard', label: 'My Rentals and Add Rentals' },
+        { href: '/dashboard/owner/my-rentals', label: 'My Rentals' },
+        { href: `/add-rent-posts`, label: 'Add Rental' },
         { href: '/dashboard/analytics', label: 'Analytics' },
     ];
 
@@ -16,7 +16,7 @@ export default function VendorSidebar() {
         <div className="w-64 bg-white shadow-md h-screen flex flex-col">
             <div className="p-4 border-b">
                 <h2 className="text-xl font-bold text-blue-600">
-                    Vendor Panel
+                    Owner Panel
                 </h2>
             </div>
             <nav className="flex-1 p-4 space-y-2">

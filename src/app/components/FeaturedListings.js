@@ -5,10 +5,10 @@ import ListingCard from './ListingCard';
 
 export default function FeaturedListings() {
   const [listings, setListings] = useState([]);
+  const api = process.env.NEXT_PUBLIC_BASE_URL;
   const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
-    fetch('/api/rent-posts?featured=true')
+    fetch(`${api}/api/rent-posts?featured=true`)
       .then(res => res.json())
       .then(data => {
         // The most likely cause of the error is that the API response is an object
@@ -58,6 +58,7 @@ export default function FeaturedListings() {
   }
 
   return (
+
     <section className="py-12">
       <h2 className="mb-8 text-3xl font-bold text-center text-base-content">
         Featured Listings

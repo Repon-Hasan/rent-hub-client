@@ -5,10 +5,13 @@ import ListingCard from './ListingCard';
 
 export default function TopRatedListings() {
   const [listings, setListings] = useState([]);
+  const api = process.env.NEXT_PUBLIC_BASE_URL;
+  // console.log('listing: ', listings);
+  // console.log(Array.isArray(listings), listings);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/rent-posts?sort=rating_desc')
+    fetch(`${api}/api/rent-posts?sort=rating_desc`)
       .then(res => res.json())
       .then(data => {
         // Correctly handle the API response format

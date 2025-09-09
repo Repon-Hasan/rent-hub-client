@@ -2,10 +2,11 @@
 
 import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
-import StatsCard from './components/common/StatsCard';
-import AdminContent from './components/admin/DashboardConent';
-import VendorContent from './components/vendor/DashboardConent';
-import UserContent from './components/user/DashboardConent';
+import StatsCard from './components/common/StatsCard'; 
+import AdminContent from './components/admin/DashboardContent'; 
+import VendorContent from './components/vendor/DashboardContent';
+import UserContent from './components/user/DashboardContent';
+import LoadingDashboard from './components/LoadingDashboard';
 
 export default function Dashboard() {
     const { data: session, status } = useSession();
@@ -26,14 +27,25 @@ export default function Dashboard() {
                         cache: 'no-store',
                     },
                 );
-                if (!res.ok) throw new Error('Failed to fetch rentals');
+                console.log('pages posts data: ', res)
+                
+                if (!res.ok) {
+                    throw new Error(`Failed to fetch rentals: ${res.status}`);
+                }
                 const data = await res.json();
+                console.log('data home page :',data)
                 setRentals(data);
+
+                // Stats update
                 setStats({
                     totalRentals: data.length,
-                    totalUsers: 150, // Mock
-                    totalVendors: data.filter((r) => r.type === 'vendor')
-                        .length,
+                    totalUsers: session?.user?.role === 'admin' ? 150 : 0,
+                    totalVendors:
+                        session?.user?.role === 'admin'
+                            ? data.filter((r) => r.type === 'owner').length
+                            : session?.user?.role === 'owner'
+                            ? data.length
+                            : 0,
                 });
             } catch (error) {
                 console.error('Error fetching rentals:', error);
@@ -41,11 +53,12 @@ export default function Dashboard() {
                 setLoading(false);
             }
         };
+
         if (session) fetchRentals();
     }, [session]);
 
     if (status === 'loading' || loading) {
-        return <div className="text-center p-6">Loading Dashboard...</div>;
+        return <LoadingDashboard/>;
     }
 
     if (!session) {
@@ -56,18 +69,14 @@ export default function Dashboard() {
         );
     }
 
-    const role = session.user?.role || 'user';
+    const role = session.user?.role || 'renter';
     const userEmail = session.user?.email || '';
-    let ContentComponent;
-    let displayedRentals = rentals;
 
+    let ContentComponent = UserContent;
     if (role === 'admin') {
         ContentComponent = AdminContent;
-    } else if (role === 'vendor') {
-        ContentComponent = VendorContent; // Vendor sees all rentals
-    } else {
-        displayedRentals = rentals.filter((r) => r.status === 'approved');
-        ContentComponent = UserContent;
+    } else if (role === 'owner') {
+        ContentComponent = VendorContent;
     }
 
     return (
@@ -78,21 +87,22 @@ export default function Dashboard() {
                     value={stats.totalRentals}
                     icon="🏠"
                 />
-                <StatsCard
-                    title="Total Users"
-                    value={stats.totalUsers}
-                    icon="👥"
-                />
-                <StatsCard
-                    title="Total Vendors"
-                    value={stats.totalVendors}
-                    icon="🏪"
-                />
+                {role === 'admin' && (
+                    <>
+                        <StatsCard
+                            title="Total Users"
+                            value={stats.totalUsers}
+                            icon="👥"
+                        />
+                        <StatsCard
+                            title="Total owners"
+                            value={stats.totalVendors}
+                            icon="🏪"
+                        />
+                    </>
+                )}
             </div>
-            <ContentComponent
-                rentals={displayedRentals}
-                userEmail={userEmail}
-            />
+            <ContentComponent rentals={rentals} userEmail={userEmail} />
         </div>
     );
 }
