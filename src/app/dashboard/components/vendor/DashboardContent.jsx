@@ -22,7 +22,7 @@ export default function VendorContent({ rentals }) {
                         className="bg-white p-4 rounded-xl shadow-sm"
                     >
                         <Image
-                            src={rental.imageUrl || '/placeholder.jpg'}
+                               src={(rental.imageUrl ? rental.imageUrl.replace('i.ibb.co.com', 'i.ibb.co') : '/placeholder.jpg')}
                             alt={rental.title}
                             width={300}
                             height={200}
