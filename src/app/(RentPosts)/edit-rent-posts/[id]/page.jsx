@@ -160,20 +160,20 @@ const EditRentPostsPage = () => {
     if (loading) return <div className="p-10 text-center">Loading...</div>;
 
     return (
-        <div className="min-h-screen w-full bg-white flex flex-col py-12">
-            <h1 className="text-center text-4xl font-bold text-gray-900 mb-10 tracking-wide font-sans">
+        <div className="min-h-screen w-full bg-base-100 text-base-content flex flex-col py-12">
+            <h1 className="text-center text-4xl font-bold text-base-content mb-10 tracking-wide font-sans">
                 Edit Rent Post
             </h1>
             <form onSubmit={handleSubmit} className="w-full px-2 sm:px-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white rounded-2xl shadow-lg p-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-base-100 rounded-2xl shadow-lg p-8">
                     <div className="flex flex-col gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                            <label className="block text-sm font-medium text-base-content mb-1">Category</label>
                             <select
                                 name="category"
                                 value={form.category}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             >
                                 <option value="">Select Category</option>
@@ -183,12 +183,12 @@ const EditRentPostsPage = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
+                            <label className="block text-sm font-medium text-base-content mb-1">Subcategory</label>
                             <select
                                 name="subcategory"
                                 value={form.subcategory}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                                 disabled={!form.category}
                             >
@@ -202,23 +202,23 @@ const EditRentPostsPage = () => {
                         {form.category === "Vehicles" ? (
                             <>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                                    <label className="block text-sm font-medium text-base-content mb-1">Model</label>
                                     <input
                                         name="title"
                                         value={form.title}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="e.g. Toyota Corolla"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Number Plate</label>
+                                    <label className="block text-sm font-medium text-base-content mb-1">Number Plate</label>
                                     <input
                                         name="description"
                                         value={form.description}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="e.g. DHAKA-D-1234"
                                         required
                                     />
@@ -227,23 +227,23 @@ const EditRentPostsPage = () => {
                         ) : form.category === "Properties & Living" ? (
                             <>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Property Title</label>
+                                    <label className="block text-sm font-medium text-base-content mb-1">Property Title</label>
                                     <input
                                         name="title"
                                         value={form.title}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="e.g. Grand Event Hall, Cozy Apartment"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Property Description</label>
+                                    <label className="block text-sm font-medium text-base-content mb-1">Property Description</label>
                                     <textarea
                                         name="description"
                                         value={form.description}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         rows={3}
                                         placeholder="Describe the property..."
                                         required
@@ -253,23 +253,23 @@ const EditRentPostsPage = () => {
                         ) : form.category === "Land & Nature" ? (
                             <>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Land Type</label>
+                                    <label className="block text-sm font-medium text-base-content mb-1">Land Type</label>
                                     <input
                                         name="title"
                                         value={form.title}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="e.g. Rice Field, Pond, Garden"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Land Description</label>
+                                    <label className="block text-sm font-medium text-base-content mb-1">Land Description</label>
                                     <textarea
                                         name="description"
                                         value={form.description}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         rows={3}
                                         placeholder="Describe the land, size, features..."
                                         required
@@ -279,23 +279,23 @@ const EditRentPostsPage = () => {
                         ) : form.category === "Events & Venues" ? (
                             <>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Venue Name</label>
+                                    <label className="block text-sm font-medium text-base-content mb-1">Venue Name</label>
                                     <input
                                         name="title"
                                         value={form.title}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="e.g. Banquet Hall, Party Space"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Venue Description</label>
+                                    <label className="block text-sm font-medium text-base-content mb-1">Venue Description</label>
                                     <textarea
                                         name="description"
                                         value={form.description}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         rows={3}
                                         placeholder="Describe the venue, capacity, amenities..."
                                         required
@@ -305,23 +305,23 @@ const EditRentPostsPage = () => {
                         ) : form.category === "Tools & Equipment" ? (
                             <>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
+                                    <label className="block text-sm font-medium text-base-content mb-1">Item Name</label>
                                     <input
                                         name="title"
                                         value={form.title}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="e.g. Drill Machine, Camera, Guitar"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Item Description</label>
+                                    <label className="block text-sm font-medium text-base-content mb-1">Item Description</label>
                                     <textarea
                                         name="description"
                                         value={form.description}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         rows={3}
                                         placeholder="Describe the item, condition, features..."
                                         required
@@ -331,23 +331,23 @@ const EditRentPostsPage = () => {
                         ) : form.category === "Lifestyle & Others" ? (
                             <>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
+                                    <label className="block text-sm font-medium text-base-content mb-1">Item Name</label>
                                     <input
                                         name="title"
                                         value={form.title}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="e.g. Sofa, Sports Gear, Book"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Item Description</label>
+                                    <label className="block text-sm font-medium text-base-content mb-1">Item Description</label>
                                     <textarea
                                         name="description"
                                         value={form.description}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         rows={3}
                                         placeholder="Describe the item, brand, features..."
                                         required
@@ -357,23 +357,23 @@ const EditRentPostsPage = () => {
                         ) : (
                             <>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                                    <label className="block text-sm font-medium text-base-content mb-1">Title</label>
                                     <input
                                         name="title"
                                         value={form.title}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="Title"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                    <label className="block text-sm font-medium text-base-content mb-1">Description</label>
                                     <textarea
                                         name="description"
                                         value={form.description}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         rows={3}
                                         placeholder="Description"
                                         required
@@ -382,120 +382,104 @@ const EditRentPostsPage = () => {
                             </>
                         )}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Location
-                            </label>
+                            <label className="block text-sm font-medium text-base-content mb-1">Location</label>
                             <input
                                 name="location"
                                 value={form.location}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="e.g. Comilla, Bangladesh"
                                 required
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Owner Name
-                            </label>
+                            <label className="block text-sm font-medium text-base-content mb-1">Owner Name</label>
                             <input
                                 name="ownerName"
                                 value={form.ownerName}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Email
-                            </label>
+                            <label className="block text-sm font-medium text-base-content mb-1">Email</label>
                             <input
                                 name="email"
                                 type="email"
                                 value={form.email}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Contact Number
-                            </label>
+                            <label className="block text-sm font-medium text-base-content mb-1">Contact Number</label>
                             <input
                                 name="contactNumber"
                                 value={form.contactNumber}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Rent Price (৳/{["Vehicles", "Tools & Equipment", "Events & Venues"].includes(form.category) ? "day" : "month"})
-                            </label>
+                            <label className="block text-sm font-medium text-base-content mb-1">Rent Price (৳/{["Vehicles", "Tools & Equipment", "Events & Venues"].includes(form.category) ? "day" : "month"})</label>
                             <input
                                 name="rentPrice"
                                 type="number"
                                 value={form.rentPrice}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Available From
-                            </label>
+                            <label className="block text-sm font-medium text-base-content mb-1">Available From</label>
                             <input
                                 name="availableFrom"
                                 type="date"
                                 value={form.availableFrom}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Available To
-                            </label>
+                            <label className="block text-sm font-medium text-base-content mb-1">Available To</label>
                             <input
                                 name="availableTo"
                                 type="date"
                                 value={form.availableTo}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Image Upload</label>
+                            <label className="block text-sm font-medium text-base-content mb-1">Image Upload</label>
                             <input
                                 type="file"
                                 name="imageFile"
                                 accept="image/*"
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                             {form.imageUrl && (
                                 <div className="mt-2">
                                     <img src={form.imageUrl} alt="Preview" className="max-h-40 rounded-lg border" />
-                                    <div className="text-xs text-gray-500 break-all">{form.imageUrl}</div>
+                                    <div className="text-xs text-base-content break-all">{form.imageUrl}</div>
                                 </div>
                             )}
                         </div>
                     </div>
                     <div className="flex flex-col gap-6 justify-between">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Location (GPS Only)
-                            </label>
-                            <div className="w-full h-64 md:h-[calc(100vh-8rem)] rounded-xl overflow-hidden border border-gray-300 relative flex items-center justify-center">
+                            <label className="block text-sm font-medium text-base-content mb-2">Location (GPS Only)</label>
+                            <div className="w-full h-64 md:h-[calc(100vh-8rem)] rounded-xl overflow-hidden border border-gray-300 relative flex items-center justify-center bg-base-200">
                                 <button
                                     type="button"
-                                    className="bg-green-600 text-white px-6 py-3 rounded-xl shadow text-lg font-semibold hover:bg-green-700 transition z-30"
+                                    className="bg-green-600 text-base-content px-6 py-3 rounded-xl shadow text-lg font-semibold hover:bg-green-700 transition z-30"
                                     onClick={handleGetLocationFromDevice}
                                 >
                                     Use My Location (GPS)
@@ -549,7 +533,7 @@ const EditRentPostsPage = () => {
                                     </>
                                 )}
                             </div>
-                            <div className="mt-2 text-xs text-gray-500">
+                            <div className="mt-2 text-xs text-base-content">
                                 {form.latitude && form.longitude
                                     ? `Latitude: ${form.latitude.toFixed(5)}, Longitude: ${form.longitude.toFixed(5)}`
                                     : "Please use GPS to select your location."}
@@ -557,7 +541,7 @@ const EditRentPostsPage = () => {
                         </div>
                         <button
                             type="submit"
-                            className="mt-8 w-full bg-blue-600 text-white font-semibold py-3 rounded-xl text-lg hover:bg-blue-700 transition"
+                            className="mt-8 w-full bg-blue-600 text-base-content font-semibold py-3 rounded-xl text-lg hover:bg-blue-700 transition"
                         >
                             Update Rent Post
                         </button>

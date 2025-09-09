@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import Swal from "sweetalert2";
 
 const imgbbApiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-
-// ...existing code...
 
 const initialForm = {
   category: "",
@@ -24,10 +24,23 @@ const initialForm = {
 };
 
 const AddRentPostsPage = () => {
+  const { data: session } = useSession();
   const [form, setForm] = useState(initialForm);
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [mapPosition, setMapPosition] = useState({ lat: 23.685, lng: 90.3563 }); // Bangladesh center
+
+  // Prefill name/email when session loads
+  useEffect(() => {
+    if (session?.user) {
+      setForm((prev) => ({
+        ...prev,
+        ownerName: session.user.name || "",
+        email: session.user.email || "",
+      }));
+    }
+  }, [session]);
+
   // Fetch categories from DB
   useEffect(() => {
     const fetchCategories = async () => {
@@ -102,7 +115,7 @@ const AddRentPostsPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("/api/rentPosts", {
+      const res = await fetch("/api/rent-posts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -110,33 +123,77 @@ const AddRentPostsPage = () => {
         body: JSON.stringify(form),
       });
       if (res.ok) {
-        alert("Rent post added successfully!");
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Rent post added successfully!",
+          timer: 2000,
+          showConfirmButton: false,
+        });
         setForm(initialForm);
         setSubcategories([]);
       } else {
         const error = await res.json();
-        alert("Failed to add rent post: " + (error?.error || res.status));
+        Swal.fire({
+          icon: "error",
+          title: "Failed!",
+          text: "Failed to add rent post: " + (error?.error || res.status),
+        });
       }
     } catch (err) {
-      alert("Error posting data.");
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "Error posting data.",
+      });
     }
   };
 
   return (
-    <div className="min-h-screen w-full bg-white flex flex-col py-12">
-      <h1 className="text-center text-4xl font-bold text-gray-900 mb-10 tracking-wide font-sans">
-        Add Rent Post
-      </h1>
-      <form onSubmit={handleSubmit} className="w-full px-2 sm:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white rounded-2xl shadow-lg p-8">
-          <div className="flex flex-col gap-6">
+    <div className="min-h-screen w-full bg-base-100 text-base-content flex flex-col py-0 relative">
+      {/* Gradient animated header */}
+      <div className="w-full h-40 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-gradient-x flex items-center justify-center rounded-b-3xl shadow-lg mb-0">
+        <h1 className="text-4xl font-extrabold text-white drop-shadow-lg tracking-wide font-sans text-center">
+          <span className="inline-flex items-center gap-2">
+            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" /></svg>
+            Add Rent Post
+          </span>
+        </h1>
+      </div>
+      {/* Step indicator */}
+      <div className="w-full flex justify-center mt-4 mb-2">
+        <div className="flex gap-4 items-center">
+          <div className="flex flex-col items-center">
+            <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">1</div>
+            <span className="text-xs mt-1">Details</span>
+          </div>
+          <div className="w-8 h-1 bg-blue-300 rounded" />
+          <div className="flex flex-col items-center">
+            <div className="w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold">2</div>
+            <span className="text-xs mt-1">Location</span>
+          </div>
+          <div className="w-8 h-1 bg-pink-300 rounded" />
+          <div className="flex flex-col items-center">
+            <div className="w-8 h-8 rounded-full bg-pink-500 text-white flex items-center justify-center font-bold">3</div>
+            <span className="text-xs mt-1">Image</span>
+          </div>
+        </div>
+      </div>
+      <form onSubmit={handleSubmit} className="w-full px-2 sm:px-6 flex flex-col md:flex-row gap-8 mt-2">
+        {/* Form Card */}
+        <div className="md:w-7/12 w-full">
+          <div className="bg-base-100 rounded-2xl shadow-2xl p-8 flex flex-col gap-6 border border-base-200">
+            {/* Category Section */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+              <label className="block text-lg font-bold text-base-content mb-2 flex items-center gap-2">
+                <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+                Category
+              </label>
               <select
                 name="category"
                 value={form.category}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-blue-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
                 <option value="">Select Category</option>
@@ -146,12 +203,15 @@ const AddRentPostsPage = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
+              <label className="block text-lg font-bold text-base-content mb-2 flex items-center gap-2">
+                <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+                Subcategory
+              </label>
               <select
                 name="subcategory"
                 value={form.subcategory}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-purple-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 required
                 disabled={!form.category}
               >
@@ -165,23 +225,23 @@ const AddRentPostsPage = () => {
             {form.category === "Vehicles" ? (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Model</label>
+                  <label className="block text-sm font-medium text-base-content mb-1">Model</label>
                   <input
                     name="title"
                     value={form.title}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="e.g. Toyota Corolla"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Number Plate</label>
+                  <label className="block text-sm font-medium text-base-content mb-1">Number Plate</label>
                   <input
                     name="description"
                     value={form.description}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="e.g. DHAKA-D-1234"
                     required
                   />
@@ -190,23 +250,23 @@ const AddRentPostsPage = () => {
             ) : form.category === "Properties & Living" ? (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Property Title</label>
+                  <label className="block text-sm font-medium text-base-content mb-1">Property Title</label>
                   <input
                     name="title"
                     value={form.title}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="e.g. Grand Event Hall, Cozy Apartment"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Property Description</label>
+                  <label className="block text-sm font-medium text-base-content mb-1">Property Description</label>
                   <textarea
                     name="description"
                     value={form.description}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     rows={3}
                     placeholder="Describe the property..."
                     required
@@ -216,23 +276,23 @@ const AddRentPostsPage = () => {
             ) : form.category === "Land & Nature" ? (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Land Type</label>
+                  <label className="block text-sm font-medium text-base-content mb-1">Land Type</label>
                   <input
                     name="title"
                     value={form.title}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="e.g. Rice Field, Pond, Garden"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Land Description</label>
+                  <label className="block text-sm font-medium text-base-content mb-1">Land Description</label>
                   <textarea
                     name="description"
                     value={form.description}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     rows={3}
                     placeholder="Describe the land, size, features..."
                     required
@@ -242,23 +302,23 @@ const AddRentPostsPage = () => {
             ) : form.category === "Events & Venues" ? (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Venue Name</label>
+                  <label className="block text-sm font-medium text-base-content mb-1">Venue Name</label>
                   <input
                     name="title"
                     value={form.title}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="e.g. Banquet Hall, Party Space"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Venue Description</label>
+                  <label className="block text-sm font-medium text-base-content mb-1">Venue Description</label>
                   <textarea
                     name="description"
                     value={form.description}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     rows={3}
                     placeholder="Describe the venue, capacity, amenities..."
                     required
@@ -268,23 +328,23 @@ const AddRentPostsPage = () => {
             ) : form.category === "Tools & Equipment" ? (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
+                  <label className="block text-sm font-medium text-base-content mb-1">Item Name</label>
                   <input
                     name="title"
                     value={form.title}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="e.g. Drill Machine, Camera, Guitar"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Item Description</label>
+                  <label className="block text-sm font-medium text-base-content mb-1">Item Description</label>
                   <textarea
                     name="description"
                     value={form.description}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     rows={3}
                     placeholder="Describe the item, condition, features..."
                     required
@@ -294,23 +354,23 @@ const AddRentPostsPage = () => {
             ) : form.category === "Lifestyle & Others" ? (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
+                  <label className="block text-sm font-medium text-base-content mb-1">Item Name</label>
                   <input
                     name="title"
                     value={form.title}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="e.g. Sofa, Sports Gear, Book"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Item Description</label>
+                  <label className="block text-sm font-medium text-base-content mb-1">Item Description</label>
                   <textarea
                     name="description"
                     value={form.description}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     rows={3}
                     placeholder="Describe the item, brand, features..."
                     required
@@ -320,23 +380,23 @@ const AddRentPostsPage = () => {
             ) : (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                  <label className="block text-sm font-medium text-base-content mb-1">Title</label>
                   <input
                     name="title"
                     value={form.title}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Title"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <label className="block text-sm font-medium text-base-content mb-1">Description</label>
                   <textarea
                     name="description"
                     value={form.description}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     rows={3}
                     placeholder="Description"
                     required
@@ -345,118 +405,91 @@ const AddRentPostsPage = () => {
               </>
             )}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Location
-              </label>
+              <label className="block text-sm font-medium text-base-content mb-1">Location</label>
               <input
                 name="location"
                 value={form.location}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g. Comilla, Bangladesh"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Owner Name
-              </label>
+              <label className="block text-sm font-medium text-base-content mb-1">Owner Name</label>
               <input
                 name="ownerName"
                 value={form.ownerName}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
+                readOnly={!!session?.user?.name}
+                disabled={!!session?.user?.name}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
+              <label className="block text-sm font-medium text-base-content mb-1">Email</label>
               <input
                 name="email"
                 type="email"
                 value={form.email}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
+                readOnly={!!session?.user?.email}
+                disabled={!!session?.user?.email}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Contact Number
-              </label>
+              <label className="block text-sm font-medium text-base-content mb-1">Contact Number</label>
               <input
                 name="contactNumber"
                 value={form.contactNumber}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Rent Price (৳/{["Vehicles", "Tools & Equipment", "Events & Venues"].includes(form.category) ? "day" : "month"})
-              </label>
+              <label className="block text-sm font-medium text-base-content mb-1">Rent Price (৳/{["Vehicles", "Tools & Equipment", "Events & Venues"].includes(form.category) ? "day" : "month"})</label>
               <input
                 name="rentPrice"
                 type="number"
                 value={form.rentPrice}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Available From
-              </label>
+              <label className="block text-sm font-medium text-base-content mb-1">Available From</label>
               <input
                 name="availableFrom"
                 type="date"
                 value={form.availableFrom}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Available To
-              </label>
+              <label className="block text-sm font-medium text-base-content mb-1">Available To</label>
               <input
                 name="availableTo"
                 type="date"
                 value={form.availableTo}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Image Upload</label>
-              <input
-                type="file"
-                name="imageFile"
-                accept="image/*"
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-              {form.imageUrl && (
-                <div className="mt-2">
-                  <img src={form.imageUrl} alt="Preview" className="max-h-40 rounded-lg border" />
-                  <div className="text-xs text-gray-500 break-all">{form.imageUrl}</div>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="flex flex-col gap-6 justify-between">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            {/* Location & Map Section (inside form) */}
+            <div className="flex flex-col gap-2">
+              <label className="text-lg font-bold text-base-content mb-2 flex items-center gap-2">
+                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 12.414a4 4 0 1 0-5.657 5.657l4.243 4.243a8 8 0 1 0 11.314-11.314l-4.243 4.243z" /></svg>
                 Location (GPS Only)
               </label>
-              <div className="w-full h-64 md:h-[calc(100vh-8rem)] rounded-xl overflow-hidden border border-gray-300 relative flex items-center justify-center">
+              <div className="w-full h-64 rounded-xl overflow-hidden border border-green-300 relative flex items-center justify-center bg-base-200 mb-2">
                 <button
                   type="button"
                   className="bg-green-600 text-white px-6 py-3 rounded-xl shadow text-lg font-semibold hover:bg-green-700 transition z-30"
@@ -513,13 +546,32 @@ const AddRentPostsPage = () => {
                   </>
                 )}
               </div>
-              <div className="mt-2 text-xs text-gray-500">
+              <div className="mt-1 text-xs text-base-content">
                 {form.latitude && form.longitude
-                  ? `Latitude: ${form.latitude.toFixed(
-                      5
-                    )}, Longitude: ${form.longitude.toFixed(5)}`
+                  ? `Latitude: ${form.latitude.toFixed(5)}, Longitude: ${form.longitude.toFixed(5)}`
                   : "Please use GPS to select your location."}
               </div>
+            </div>
+            {/* Image Upload Section (inside form, keep imgbb logic) */}
+            <div className="flex flex-col gap-2 mt-4">
+              <label className="text-lg font-bold text-base-content mb-2 flex items-center gap-2">
+                <svg className="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2zm0 0l7 7 4-4 5 5" /></svg>
+                Image Upload
+              </label>
+              <input
+                type="file"
+                name="imageFile"
+                accept="image/*"
+                onChange={handleChange}
+                className="w-full border border-pink-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                required
+              />
+              {form.imageUrl && (
+                <div className="mt-2 flex flex-col items-center">
+                  <img src={form.imageUrl} alt="Preview" className="max-h-40 rounded-lg border shadow-lg" />
+                  <div className="text-xs text-base-content break-all mt-1">{form.imageUrl}</div>
+                </div>
+              )}
             </div>
             <button
               type="submit"
@@ -527,6 +579,28 @@ const AddRentPostsPage = () => {
             >
               Add Rent Post
             </button>
+          </div>
+        </div>
+        {/* Live Preview Card */}
+        <div className="md:w-5/12 w-full flex flex-col items-center justify-start">
+          <div className="bg-base-200 rounded-2xl shadow-xl p-6 w-full mt-4 border border-base-300">
+            <h2 className="text-2xl font-bold text-base-content mb-2 text-center">Live Preview</h2>
+            <div className="flex flex-col gap-2 items-center">
+              {form.imageUrl ? (
+                <img src={form.imageUrl} alt="Preview" className="max-h-32 rounded-lg border shadow mb-2" />
+              ) : (
+                <div className="w-full h-32 bg-base-100 rounded-lg flex items-center justify-center text-base-content">Image Preview</div>
+              )}
+              <div className="text-lg font-bold text-base-content">{form.title || "Title"}</div>
+              <div className="text-base text-base-content">{form.description || "Description"}</div>
+              <div className="flex gap-2 mt-2">
+                <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">{form.category || "Category"}</span>
+                {form.subcategory && <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-semibold">{form.subcategory}</span>}
+              </div>
+              <div className="text-sm text-base-content mt-2">Location: {form.location || "Location"}</div>
+              <div className="text-sm text-base-content">Price: ৳{form.rentPrice || "0"} {['Vehicles', 'Tools & Equipment', 'Events & Venues'].includes(form.category) ? '/day' : '/month'}</div>
+              <div className="text-xs text-base-content">Available: {form.availableFrom || "From"} - {form.availableTo || "To"}</div>
+            </div>
           </div>
         </div>
       </form>
