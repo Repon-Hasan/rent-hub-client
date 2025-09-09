@@ -136,6 +136,7 @@ const AddRentPostsPage = () => {
         try {
             const res = await fetch('/api/rentPosts', {
                 method: 'POST',
+                
                 headers: {
                     'Content-Type': 'application/json',
                 },
