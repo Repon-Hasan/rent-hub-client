@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 
@@ -7,12 +8,11 @@ export async function POST(req) {
     const tran_id = formData.get("tran_id");
     const status = formData.get("status"); // VALID / FAILED
 
-    if (!tran_id) {
-      return new Response(
-        JSON.stringify({ error: "Transaction ID missing" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
+    if (!tran_id)
+      return NextResponse.json(
+        { error: "Transaction ID missing" },
+        { status: 400 }
       );
-    }
 
     const client = await clientPromise;
     const db = client.db(process.env.DB_NAME);
@@ -22,13 +22,11 @@ export async function POST(req) {
       tran_id,
       status: "pending",
     });
-    
-    if (!pendingBooking) {
-      return new Response(
-        JSON.stringify({ error: "Pending booking not found" }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
+    if (!pendingBooking)
+      return NextResponse.json(
+        { error: "Pending booking not found" },
+        { status: 404 }
       );
-    }
 
     if (status === "VALID") {
       // Update booking status to confirmed
@@ -39,10 +37,10 @@ export async function POST(req) {
           { $set: { status: "confirmed", confirmedAt: new Date() } }
         );
       // Increment rentCount in rentPost collection
-      await db.collection("rentPost").updateOne(
-        { _id: pendingBooking.postId },
+      await db.collection("rentPosts").updateOne(
+        { _id: new ObjectId(pendingBooking.postId) }, // assuming postId is stored in booking
         { $inc: { rentCount: 1 } },
-        { upsert: true }
+        { upsert: true } // create rentCount if it doesn't exist
       );
     }
 
@@ -59,7 +57,7 @@ export async function POST(req) {
       date: new Date(),
     });
 
-    // Redirect user to proper page using Response.redirect
+    // Redirect user to proper page
     if (status === "VALID") {
       return Response.redirect(
         `${process.env.NEXT_PUBLIC_BASE_URL}/booking/payment-success`
@@ -71,9 +69,9 @@ export async function POST(req) {
     }
   } catch (err) {
     console.error("Booking Payment Success Error:", err);
-    return new Response(
-      JSON.stringify({ error: "Something went wrong" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+    return Response.json(
+      { error: "Something went wrong" },
+      { status: 500 }
     );
   }
 }
