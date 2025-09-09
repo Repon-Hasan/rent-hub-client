@@ -2,8 +2,8 @@
 
 export default function Page() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-green-50 p-6">
-      <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
+    <div className="flex items-center justify-center min-h-screen bg-base-300 p-6">
+      <div className="bg-base-200 rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
         {/* Icon / visual */}
         <div className="mb-4">
           <svg
@@ -26,7 +26,7 @@ export default function Page() {
         <h1 className="text-2xl font-bold mb-2 text-green-700">Payment Successful!</h1>
 
         {/* Message */}
-        <p className="text-gray-600 mb-6">
+        <p className="mb-6">
           Congratulations! You are now upgraded to an owner. Your account has been successfully updated.
         </p>
 
