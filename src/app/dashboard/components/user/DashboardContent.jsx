@@ -44,9 +44,11 @@ export default function UserContent({ rentals }) {
                         <p className="text-lg font-bold text-green-600">
                             ৳{rental.rentPrice}
                         </p>
-                        <button className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
-                            View Details
-                        </button>
+                        <Link href={`/rent-posts/${rental._id}`}>
+                            <button className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                                View Details
+                            </button>
+                        </Link>
                     </div>
                 ))}
             </div>

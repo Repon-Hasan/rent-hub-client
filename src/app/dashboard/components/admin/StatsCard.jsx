@@ -5,7 +5,7 @@ export default function StatsCard({ title, value, icon, trend }) {
                 <div>
                     <p className="text-sm text-gray-600 mb-1">{title}</p>
                     <p className="text-2xl font-bold text-gray-900">{value}</p>
-                    {trend && (
+                    {trend && (  
                         <p
                             className={`text-sm ${
                                 trend.startsWith('+')
