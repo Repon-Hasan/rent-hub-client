@@ -3,6 +3,7 @@
 
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Header({ user }) {
     const handleSignOut = () => {
@@ -15,13 +16,14 @@ export default function Header({ user }) {
                 RentHub Dashboard
             </h1>
             <div className="flex items-center space-x-4">
-                {user.image && (
-                    <img
-                        src={user.image}
-                        alt={user.name || 'User'}
-                        className="w-8 h-8 rounded-full"
-                    />
-                )}
+                <Image
+                    src={user.image || '/default-avatar.png'}
+                    alt={user.name || user.email || 'User'}
+                    width={32}
+                    height={32}
+                    className="w-8 h-8 rounded-full object-cover"
+                    priority
+                />
                 <span className="text-sm text-base-content hidden md:block">
                     {user.name || user.email}
                 </span>

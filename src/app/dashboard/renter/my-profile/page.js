@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useSession } from 'next-auth/react';
 import { toast } from 'react-hot-toast';
 import { useEffect } from 'react';
+import Image from 'next/image';
 
 export default function MyProfile() {
     const { data } = useSession();
@@ -23,12 +24,16 @@ export default function MyProfile() {
             >
                 {/* Profile Image */}
                 <div className="flex justify-center">
-                    <motion.img
-                        src={image || '/default-avatar.png'}
-                        alt="Profile Picture"
-                        className="w-32 h-32 rounded-full border-4 border-primary shadow-md"
-                        whileHover={{ scale: 1.05 }}
-                    />
+                    <motion.div whileHover={{ scale: 1.05 }}>
+                        <Image
+                            src={image || '/default-avatar.png'}
+                            alt="Profile Picture"
+                            width={128}
+                            height={128}
+                            className="w-32 h-32 rounded-full border-4 border-primary shadow-md object-cover"
+                            priority
+                        />
+                    </motion.div>
                 </div>
 
                 {/* Profile Info */}
