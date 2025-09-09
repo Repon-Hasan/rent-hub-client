@@ -88,26 +88,11 @@ const RentPostsList = ({ posts, handleDelete }) => (
           </div>
         </Link>
         <div className="flex flex-row gap-2 w-full px-3 pb-3">
-          <Link href={`/rent-posts/${post._id}`} className="w-1/2">
+          <Link href={`/rent-posts/${post._id}`} className="w-full">
             <span className="w-full bg-blue-600 text-white font-semibold py-1.5 rounded-xl text-sm hover:bg-blue-700 transition flex items-center justify-center cursor-pointer">
               View Detail
             </span>
           </Link>
-          <Link href={`/edit-rent-posts/${post._id}`} className="w-1/2">
-            <span className="w-full bg-yellow-500 text-white font-semibold py-1.5 rounded-xl text-sm hover:bg-yellow-600 transition flex items-center justify-center cursor-pointer">
-              Edit
-            </span>
-          </Link>
-          <button
-            className="w-1/2 bg-red-600 text-white font-semibold py-1.5 rounded-xl text-sm hover:bg-red-700 transition"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleDelete(post._id);
-            }}
-          >
-            Delete
-          </button>
         </div>
       </div>
     ))}
