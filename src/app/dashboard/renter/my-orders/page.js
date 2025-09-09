@@ -1,11 +1,12 @@
-'use client'
+
+'use client';
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import { useSession } from 'next-auth/react';
 
-// Mock data (replace with API call)
+
 const mockOrders = [
     {
         id: 1,
@@ -16,35 +17,21 @@ const mockOrders = [
     },
     {
         id: 2,
-        product: 'Phone',
-        price: 15000,
+        product: 'Camera',
+        price: 12000,
         status: 'Pending',
-        date: '2025-09-01',
-    },
-    {
-        id: 3,
-        product: 'House',
-        price: 5000000,
-        status: 'Processing',
-        date: '2025-09-05',
+        date: '2025-08-10',
     },
 ];
 
 export default function MyOrders() {
-
     const { data: session } = useSession();
     const [orders, setOrders] = useState([]);
 
     useEffect(() => {
-        if (session?.user?.email) {
-            fetch(`/api/bookings?email=${session.user.email}`)
-                .then((res) => res.json())
-                .then((data) => setOrders(data))
-                .catch((err) => console.error('Fetch error:', err));
-        }
-    }, [session?.user?.email]);
-
-    console.log(orders)
+        // Replace with API call if needed
+        setOrders(mockOrders);
+    }, []); // Dependency array is always []
 
     if (!session) {
         return (
@@ -54,12 +41,8 @@ export default function MyOrders() {
         );
     }
 
-    // useEffect(() => {
-    //     toast.success('Your orders loaded!');
-    // }, []);
-
     return (
-        <div className="container mx-auto text-gray-800 p-4">
+        <div className="bg-base-100 text-base-content min-h-screen">
             <motion.h2
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -110,7 +93,7 @@ export default function MyOrders() {
                 </table>
             </div>
             {orders.length === 0 && (
-                <p className=" text-gray-500 mt-4 h-[500px] flex justify-center items-center">
+                <p className="text-gray-500 mt-4 h-[500px] flex justify-center items-center">
                     No orders found.
                 </p>
             )}

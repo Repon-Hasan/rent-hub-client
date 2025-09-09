@@ -10,8 +10,8 @@ export default function Header({ user }) {
     };
 
     return (
-        <header className="bg-white shadow-sm p-4 flex justify-between items-center sticky top-0 z-10">
-            <h1 className="text-xl font-semibold text-gray-800">
+    <header className="bg-base-100 shadow-sm p-4 flex justify-between items-center sticky top-0 z-10 text-base-content">
+            <h1 className="text-xl font-semibold text-base-content">
                 RentHub Dashboard
             </h1>
             <div className="flex items-center space-x-4">
@@ -22,12 +22,12 @@ export default function Header({ user }) {
                         className="w-8 h-8 rounded-full"
                     />
                 )}
-                <span className="text-sm text-gray-600 hidden md:block">
+                <span className="text-sm text-base-content hidden md:block">
                     {user.name || user.email}
                 </span>
                 <button
                     onClick={handleSignOut}
-                    className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition"
+                    className="bg-red-500 text-base-content px-4 py-2 rounded-md hover:bg-red-600 transition"
                 >
                     Sign Out
                 </button>
