@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Loading from "@/app/loading";
 
 async function getRentPost(id) {
   const res = await fetch(
@@ -58,24 +59,54 @@ const Page = ({ params }) => {
     if (form.startDate && form.endDate && post) {
       const sDate = new Date(form.startDate);
       const eDate = new Date(form.endDate);
-      if (sDate <= eDate) {
-        const diffDays =
-          Math.ceil((eDate - sDate) / (1000 * 60 * 60 * 24)) + 1;
-        const months =
-          eDate.getMonth() -
-          sDate.getMonth() +
-          12 * (eDate.getFullYear() - sDate.getFullYear());
-        setMonthDiff(months + 1);
-        setTotalCost(diffDays * parseFloat(post.rentPrice));
 
-        if (months + 1 > 3)
+      if (sDate <= eDate) {
+        // Total days
+        const diffTime = eDate - sDate;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+        // Calculate years, months, days
+        let years = eDate.getFullYear() - sDate.getFullYear();
+        let months = eDate.getMonth() - sDate.getMonth();
+        let days = eDate.getDate() - sDate.getDate();
+
+        if (days < 0) {
+          months -= 1;
+          const prevMonth = new Date(eDate.getFullYear(), eDate.getMonth(), 0);
+          days += prevMonth.getDate();
+        }
+
+        if (months < 0) {
+          years -= 1;
+          months += 12;
+        }
+
+        // Build dynamic duration string
+        const parts = [];
+        if (years > 0) parts.push(`${years} year${years > 1 ? "s" : ""}`);
+        if (months > 0) parts.push(`${months} month${months > 1 ? "s" : ""}`);
+        if (days > 0 || parts.length === 0) parts.push(`${days} day${days > 1 ? "s" : ""}`);
+
+        const durationStr = parts.join(", ");
+
+        // Set state
+        setMonthDiff(months + years * 12);
+        setTotalCost(diffDays * parseFloat(post.rentPrice));
+        setForm((prev) => ({ ...prev, durationStr }));
+
+        // Advance payment logic
+        if (months + years * 12 > 3) {
           setForm((prev) => ({ ...prev, advance: post.rentPrice * 30 }));
-        else setForm((prev) => ({ ...prev, advance: 0 }));
+        } else {
+          setForm((prev) => ({ ...prev, advance: 0 }));
+        }
       }
     }
   }, [form.startDate, form.endDate, post]);
 
-  if (loading) return <div>Loading...</div>;
+
+
+  if (loading) return <Loading></Loading>;
   if (!post) return <div>Post not found.</div>;
 
   const handleChange = (e) => {
@@ -156,18 +187,18 @@ const Page = ({ params }) => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto mt-10 p-8 bg-white  rounded-2xl shadow-xl border-2">
+    <div className="max-w-5xl mx-auto my-10 p-8 bg-white  rounded-2xl shadow-xl border-2">
       <h2 className="text-3xl font-bold mb-6 text-center">Checkout: {post.title}</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Left: Item Info */}
-        <div className="space-y-4">
+        <div className="space-y-4 flex-1">
           <img
             src={post.imageUrl}
             alt={post.title}
             className="w-full h-60 object-cover rounded-lg shadow"
           />
-          <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-sm">
+          <div className="bg-base-200 p-4 rounded-lg space-y-2 text-sm">
             <p><strong>Category:</strong> {post.category}</p>
             {post.subcategory && <p><strong>Subcategory:</strong> {post.subcategory}</p>}
             <p><strong>Location:</strong> {post.location}</p>
@@ -179,7 +210,7 @@ const Page = ({ params }) => {
         </div>
 
         {/* Right: Form */}
-        <div className="space-y-5 bg-gray-50 p-6 rounded-xl shadow-sm">
+        <div className="space-y-5 bg-base-200 p-6 rounded-xl shadow-sm flex-1">
           <div className="grid grid-cols-1 gap-4">
             <input
               type="text"
@@ -253,10 +284,15 @@ const Page = ({ params }) => {
 
           {totalCost > 0 && (
             <div className="bg-white border p-4 rounded-lg">
-              <p className="text-gray-700">Duration: <strong>{monthDiff} months</strong></p>
-              <p className="text-lg font-semibold text-green-600">Total Rent: ৳{totalCost}</p>
+              <p className="text-gray-700">
+                Duration: <strong>{form.durationStr}</strong>
+              </p>
+              <p className="text-lg font-semibold text-green-600">
+                Total Rent: ৳{totalCost}
+              </p>
             </div>
           )}
+
 
           <button
             onClick={handlePayNow}
