@@ -199,7 +199,7 @@ const Page = ({ params }) => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto my-10 p-8 bg-white  rounded-2xl shadow-xl border-2">
+    <div className="max-w-5xl mx-auto my-10 p-8 bg-base-100  rounded-2xl shadow-xl border-2">
       <h2 className="text-3xl font-bold mb-6 text-center">Checkout: {post.title}</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

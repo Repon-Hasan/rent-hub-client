@@ -65,10 +65,10 @@ export default function BecomeOwnerPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-6">
-      <div className="bg-white shadow-2xl rounded-3xl p-10 w-full max-w-xl text-center transform transition-all duration-500 ">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-base-100 p-6">
+      <div className="bg-base-200 shadow-2xl rounded-3xl p-10 w-full max-w-xl text-center transform transition-all duration-500 ">
         <h1 className="text-4xl font-bold mb-8 text-blue-700 animate-bounce">Apply for Owner</h1>
-        <div className="grid gap-5">
+        <div className="grid gap-5 ">
           <div className="relative">
             <HiUser className="absolute top-3 left-3 text-gray-400" size={20} />
             <input
