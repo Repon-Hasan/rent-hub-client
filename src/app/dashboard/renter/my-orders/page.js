@@ -7,31 +7,33 @@ import { toast } from 'react-hot-toast';
 import { useSession } from 'next-auth/react';
 
 
-const mockOrders = [
-    {
-        id: 1,
-        product: 'Bike',
-        price: 25000,
-        status: 'Delivered',
-        date: '2025-08-15',
-    },
-    {
-        id: 2,
-        product: 'Camera',
-        price: 12000,
-        status: 'Pending',
-        date: '2025-08-10',
-    },
-];
+
 
 export default function MyOrders() {
     const { data: session } = useSession();
     const [orders, setOrders] = useState([]);
 
     useEffect(() => {
-        // Replace with API call if needed
-        setOrders(mockOrders);
-    }, []); // Dependency array is always []
+        async function fetchBookings() {
+            if (!session?.user?.email) {
+                setOrders([]);
+                return;
+            }
+            try {
+                // Fetch all bookings for the user
+                const res = await fetch(`/api/bookings?email=${session.user.email}`);
+                if (!res.ok) {
+                    setOrders([]);
+                    return;
+                }
+                const data = await res.json();
+                setOrders(Array.isArray(data) ? data : []);
+            } catch {
+                setOrders([]);
+            }
+        }
+        fetchBookings();
+    }, [session]);
 
     if (!session) {
         return (
@@ -39,6 +41,26 @@ export default function MyOrders() {
                 Please login to see your orders.
             </p>
         );
+    }
+
+    // Helper to format date as '10th Jun 2025'
+    function formatDate(dateStr) {
+        if (!dateStr) return '-';
+        const date = new Date(dateStr);
+        const day = date.getDate();
+        const month = date.toLocaleString('en-US', { month: 'short' });
+        const year = date.getFullYear();
+        // Get ordinal suffix
+        const getOrdinal = (n) => {
+            if (n > 3 && n < 21) return 'th';
+            switch (n % 10) {
+                case 1: return 'st';
+                case 2: return 'nd';
+                case 3: return 'rd';
+                default: return 'th';
+            }
+        };
+        return `${day}${getOrdinal(day)} ${month} ${year}`;
     }
 
     return (
@@ -55,7 +77,7 @@ export default function MyOrders() {
                 <table className="table w-full">
                     <thead>
                         <tr className='text-black'>
-                            <th>Order ID</th>
+                            <th>Serial</th>
                             <th>Product</th>
                             <th>Price</th>
                             <th>Status</th>
@@ -63,16 +85,16 @@ export default function MyOrders() {
                         </tr>
                     </thead>
                     <tbody>
-                        {orders.map((order) => (
+                        {orders.map((order, idx) => (
                             <motion.tr
-                                key={order.id}
+                                key={order._id || order.id}
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 0.3 }}
                             >
-                                <td>{order.id}</td>
-                                <td>{order.product}</td>
-                                <td>{order.price} BDT</td>
+                                <td>{idx + 1}</td>
+                                <td>{order.itemTitle || order.category || '-'}</td>
+                                <td>{order.totalCost ? `${order.totalCost} BDT` : '-'}</td>
                                 <td>
                                     <span
                                         className={`badge ${
@@ -83,10 +105,10 @@ export default function MyOrders() {
                                                 : 'badge-info'
                                         }`}
                                     >
-                                        {order.status}
+                                        {order.status || 'Pending'}
                                     </span>
                                 </td>
-                                <td>{order.date}</td>
+                                <td>{order.createdAt ? formatDate(order.createdAt) : '-'}</td>
                             </motion.tr>
                         ))}
                     </tbody>
