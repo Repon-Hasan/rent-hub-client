@@ -12,7 +12,7 @@ const BookingSuccess = () => {
           Thank you! Your booking has been successfully completed.
         </p>
         <Link
-          href="/dashboard"
+          href="/dashboard/my-orders"
           className="inline-block bg-green-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-700 transition"
         >
           View My Bookings
