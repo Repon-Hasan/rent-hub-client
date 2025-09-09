@@ -76,7 +76,12 @@ const DetailPage = async (props) => {
             <div className="font-semibold text-gray-800 mb-2">Contact</div>
             <div className="flex justify-between py-1 text-sm">
               <span>Owner</span>
-              <span className="font-bold text-gray-900">{post.ownerName}</span>
+              <Link
+                href={`/owner/${post.ownerId}`}
+                className="font-bold text-gray-900 hover:text-blue-600 hover:underline transition"
+              >
+                {post.ownerName}
+              </Link>
             </div>
             <div className="flex justify-between py-1 text-sm">
               <span>Email</span>
@@ -92,7 +97,7 @@ const DetailPage = async (props) => {
         </div>
       </main>
       {/* AI Insights full width under image */}
-  <AIInsights post={post} />
+      <AIInsights post={post} />
       {/* Map Section */}
       <section className="w-full mx-auto px-2 sm:px-6 mt-8 flex flex-col items-center">
         <div className="mb-2 text-lg font-semibold text-gray-800 self-start">
