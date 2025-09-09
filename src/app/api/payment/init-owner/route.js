@@ -18,7 +18,7 @@ export async function POST(req) {
       tran_id,
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/payment/success`,
       fail_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/payment/fail`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/become-owner`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/payment/fail`,
       cus_name: "Customer",
       cus_email: email,
       cus_add1: "House 123, Road 45",
