@@ -4,6 +4,37 @@ import dbConnect from '@/lib/dbConnect';
 import { NextResponse } from 'next/server';
 import { ObjectId } from 'mongodb';
 
+export async function PATCH(req) {
+    // Only allow logged-in users
+    const session = await getServerSession(authOptions);
+    if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { postId, action } = await req.json();
+    if (!postId || !['add', 'remove'].includes(action)) {
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    }
+
+    const { collection, client } = await dbConnect('users');
+    try {
+        const user = await collection.findOne({ email: session.user.email });
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+        let update;
+        if (action === 'add') {
+            update = { $addToSet: { bookmarks: postId } };
+        } else {
+            update = { $pull: { bookmarks: postId } };
+        }
+        await collection.updateOne({ email: session.user.email }, update);
+        return NextResponse.json({ message: 'Bookmark updated' }, { status: 200 });
+    } finally {
+        await client.close();
+    }
+}
+
 export async function GET(req) {
     // session fetch
     const session = await getServerSession(authOptions);
@@ -11,21 +42,19 @@ export async function GET(req) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // live DB থেকে user role check
     const { collection, client } = await dbConnect('users');
-    const user = await collection.findOne({ email: session.user.email });
-
     try {
-        if (!user || user.role !== 'admin') {
-            return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 },
-            );
+        const user = await collection.findOne({ email: session.user.email });
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
-       
-        const data = await collection.find({}).toArray();
-
-        return NextResponse.json(data, { status: 200 });
+        // If admin, return all users
+        if (user.role === 'admin') {
+            const data = await collection.find({}).toArray();
+            return NextResponse.json(data, { status: 200 });
+        }
+        // Otherwise, return only current user's data
+        return NextResponse.json(user, { status: 200 });
     } finally {
         await client.close();
     }
