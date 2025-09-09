@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-export default function FailPage() {
+export default function Page() {
   return (
     <div className="flex items-center justify-center h-screen bg-red-50">
       <div className="bg-white p-10 rounded-2xl shadow-lg text-center">

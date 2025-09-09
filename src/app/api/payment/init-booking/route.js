@@ -43,6 +43,7 @@ export async function POST(req) {
       advance: advance > 0 ? advance : 0,
       monthDiff,
       status: "pending",
+      rentCount: 0,
       createdAt: new Date(),
       tran_id,
     };

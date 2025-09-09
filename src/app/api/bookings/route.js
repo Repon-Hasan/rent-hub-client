@@ -10,14 +10,15 @@ export async function GET(req) {
     const url = new URL(req.url);
     const postId = url.searchParams.get("postId");
     const email = url.searchParams.get("email");
+    
 
-    let query = { status: "success" }; // ✅ Only confirmed bookings
+    let query = { }; // ✅ Only confirmed bookings
     if (postId) query.postId = postId;
     if (email) query.email = email;
 
     const bookings = await db
       .collection("bookings")
-      .find(query)
+      .find(query||"")
       .sort({ startDate: 1 })
       .toArray();
 

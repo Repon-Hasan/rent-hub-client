@@ -1,6 +1,6 @@
 "use client";
 
-export default function SuccessPage() {
+export default function Page() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-green-50 p-6">
       <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">

@@ -18,6 +18,7 @@ export async function POST(req) {
     const pendingBooking = await db.collection("bookings").findOne({
       tran_id,
       status: "pending",
+      rentCount,
     });
     if (!pendingBooking)
       return NextResponse.json({ error: "Pending booking not found" }, { status: 404 });
@@ -26,7 +27,7 @@ export async function POST(req) {
       // Update booking status to confirmed
       await db.collection("bookings").updateOne(
         { _id: pendingBooking._id },
-        { $set: { status: "confirmed", confirmedAt: new Date() } }
+        { $set: { status: "confirmed", confirmedAt: new Date(), rentCount: rentCount++} }
       );
     }
 
