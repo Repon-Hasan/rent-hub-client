@@ -76,7 +76,12 @@ const DetailPage = async (props) => {
             <div className="font-semibold text-base-content mb-2">Contact</div>
             <div className="flex justify-between py-1 text-sm">
               <span>Owner</span>
-              <span className="font-bold text-base-content">{post.ownerName}</span>
+              <Link
+                href={`/owner/${post.ownerId}`}
+                className="font-bold text-gray-900 hover:text-blue-600 hover:underline transition"
+              >
+                {post.ownerName}
+              </Link>
             </div>
             <div className="flex justify-between py-1 text-sm">
               <span>Email</span>
