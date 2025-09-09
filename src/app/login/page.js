@@ -2,7 +2,7 @@
 
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Swal from "sweetalert2";
 
 export default function LoginPage() {
@@ -11,6 +11,12 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  // Get callbackUrl from query or referrer
+  let callbackUrl = searchParams.get("callbackUrl");
+  if (!callbackUrl && typeof window !== "undefined") {
+    callbackUrl = document.referrer || "/";
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,6 +26,7 @@ export default function LoginPage() {
       redirect: false,
       email,
       password,
+      callbackUrl,
     });
 
     setIsLoading(false);
@@ -32,13 +39,14 @@ export default function LoginPage() {
         confirmButtonColor: "#2563EB",
       });
     } else {
-      router.push("/");
+      // Always redirect to callbackUrl if present
+      router.push(callbackUrl || "/");
     }
   };
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
-    await signIn("google", { callbackUrl: "/" });
+    await signIn("google", { callbackUrl });
     setIsLoading(false);
   };
 

@@ -1,8 +1,11 @@
+"use client"
 import React from "react";
 import AIInsights from "./AIInsights";
 
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 function formatDate(dateStr) {
   const date = new Date(dateStr);
@@ -21,10 +24,36 @@ async function getRentPost(id) {
   return post;
 }
 
-const DetailPage = async (props) => {
-  const params = typeof props.params?.then === "function" ? await props.params : props.params;
-  const post = await getRentPost(params.id);
+const DetailPage = (props) => {
+  const params = props.params;
+  const [post, setPost] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  React.useEffect(() => {
+    (async () => {
+      const awaitedParams = typeof params?.then === "function" ? await params : params;
+      const data = await getRentPost(awaitedParams.id);
+      setPost(data);
+      setLoading(false);
+    })();
+  }, [params]);
+
+  // Client-side session and router
+  const { data: session } = useSession();
+  const router = useRouter();
+  const handleBookNow = (e) => {
+    e.preventDefault();
+    if (!post) return; // Prevent action if post is not loaded
+    if (!session) {
+      const callbackUrl = `/checkout/${post.id}`;
+      router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+    } else {
+      router.push(`/checkout/${post.id}`);
+    }
+  };
+
+  if (loading) return <div className="w-full flex justify-center items-center py-20"><span className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid"></span></div>;
   if (!post) return notFound();
+
   return (
     <div className="min-h-screen w-full bg-base-100 text-base-content flex flex-col my-10">
       <main className="w-full mx-auto px-2 sm:px-6 py-8 flex flex-col md:flex-row gap-10">
@@ -117,11 +146,12 @@ const DetailPage = async (props) => {
           ></iframe>
         </div>
         <div className="flex gap-4 mt-8">
-          <Link href={`/checkout/${post.id}`}>
-            <button className="bg-blue-600 text-base-content px-5 font-semibold py-3 rounded-xl text-lg hover:bg-blue-700 transition">
-              Book Now
-            </button>
-          </Link>
+          <button
+            className="bg-blue-600 text-base-content px-5 font-semibold py-3 rounded-xl text-lg hover:bg-blue-700 transition"
+            onClick={handleBookNow}
+          >
+            Book Now
+          </button>
           <button className="bg-base-200 px-5 text-base-content font-semibold py-3 rounded-xl text-lg hover:bg-base-300 transition">
             Contact Host
           </button>
