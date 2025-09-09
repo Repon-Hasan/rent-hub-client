@@ -11,7 +11,7 @@ export async function GET(req) {
     const postId = url.searchParams.get("postId");
     const email = url.searchParams.get("email");
 
-    let query = {};
+    let query = { status: "success" }; // ✅ Only confirmed bookings
     if (postId) query.postId = postId;
     if (email) query.email = email;
 

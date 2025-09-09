@@ -54,6 +54,8 @@ const Page = ({ params }) => {
     })();
   }, [params]);
 
+
+
   // Update total cost and monthDiff
   useEffect(() => {
     if (form.startDate && form.endDate && post) {
@@ -113,78 +115,93 @@ const Page = ({ params }) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handlePayNow = async () => {
-    if (!session) {
-      router.push("/login");
-    }
-    else {
-      if (!form.startDate || !form.endDate) {
-        Swal.fire({
-          icon: "warning",
-          title: "Select Dates",
-          text: "Please select start and end dates.",
+const handlePayNow = async () => {
+  if (!session) {
+    router.push("/login");
+    return;
+  }
+
+  if (!form.startDate || !form.endDate) {
+    Swal.fire({
+      icon: "warning",
+      title: "Select Dates",
+      text: "Please select start and end dates.",
+    });
+    return;
+  }
+
+  const sDate = new Date(form.startDate);
+  const eDate = new Date(form.endDate);
+  const availStart = new Date(post.availableFrom);
+  const availEnd = new Date(post.availableTo);
+
+  // 1️⃣ Check if selected dates are within availability
+  if (sDate < availStart || eDate > availEnd) {
+    Swal.fire({
+      icon: "warning",
+      title: "Unavailable",
+      text: `Selected date range is not available. Available: ${post.availableFrom} → ${post.availableTo}`,
+    });
+    return;
+  }
+
+  // 2️⃣ Check if dates overlap with existing confirmed bookings
+  const confirmedBookings = bookedDates.filter(b => b.status === "success");
+  const conflict = confirmedBookings.some((b) => {
+    const bStart = new Date(b.startDate);
+    const bEnd = new Date(b.endDate);
+    return sDate <= bEnd && eDate >= bStart;
+  });
+
+  if (conflict) {
+    Swal.fire({
+      icon: "error",
+      title: "Already Booked",
+      text: "Selected dates conflict with existing booking. Please choose another date range.",
+    });
+    return;
+  }
+
+  // 3️⃣ SweetAlert confirmation before payment
+  Swal.fire({
+    icon: "question",
+    title: "Confirm Payment",
+    text: `You will pay ৳${form.advance > 0 ? form.advance : totalCost}. Proceed?`,
+    showCancelButton: true,
+    confirmButtonText: "Yes, Pay Now",
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        // 4️⃣ Create pending booking first
+        const pendingRes = await fetch("/api/payment/init-booking", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...form,
+            totalCost,
+            monthDiff,
+            postId: post._id,
+            title: post.title,
+            status: "pending", // initial status
+          }),
         });
-        return;
-      }
 
-      const sDate = new Date(form.startDate);
-      const eDate = new Date(form.endDate);
-      const availStart = new Date(post.availableFrom);
-      const availEnd = new Date(post.availableTo);
+        const pendingData = await pendingRes.json();
 
-      // 1️⃣ Check if selected dates are within availability
-      if (sDate < availStart || eDate > availEnd) {
-        Swal.fire({
-          icon: "warning",
-          title: "Unavailable",
-          text: `Selected date range is not available. Available: ${post.availableFrom} → ${post.availableTo}`,
-        });
-        return;
-      }
-
-      // 2️⃣ Check if dates overlap with existing bookings
-      const conflict = bookedDates.some((b) => {
-        const bStart = new Date(b.startDate);
-        const bEnd = new Date(b.endDate);
-        return sDate <= bEnd && eDate >= bStart;
-      });
-
-      if (conflict) {
-        Swal.fire({
-          icon: "error",
-          title: "Already Booked",
-          text: "Selected dates conflict with existing booking. Please choose another date range.",
-        });
-        return;
-      }
-
-      // 3️⃣ SweetAlert confirmation before payment
-      Swal.fire({
-        icon: "question",
-        title: "Confirm Payment",
-        text: `You will pay ৳${form.advance > 0 ? form.advance : totalCost}. Proceed?`,
-        showCancelButton: true,
-        confirmButtonText: "Yes, Pay Now",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            const res = await fetch("/api/payment/init-booking", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ ...form, totalCost, monthDiff, postId: post._id, title: post.title }),
-            });
-            const data = await res.json();
-
-            if (data.paymentUrl) window.location.href = data.paymentUrl;
-            else Swal.fire({ icon: "error", title: "Payment Failed", text: "Cannot initialize payment." });
-          } catch (err) {
-            Swal.fire({ icon: "error", title: "Payment Error", text: "Something went wrong." });
-          }
+        if (pendingData.paymentUrl) {
+          // Redirect user to payment
+          window.location.href = pendingData.paymentUrl;
+        } else {
+          Swal.fire({ icon: "error", title: "Payment Failed", text: "Cannot initialize payment." });
         }
-
-      });
+      } catch (err) {
+        console.error(err);
+        Swal.fire({ icon: "error", title: "Payment Error", text: "Something went wrong." });
+      }
     }
-  };
+  });
+};
+
 
   return (
     <div className="max-w-5xl mx-auto my-10 p-8 bg-white  rounded-2xl shadow-xl border-2">
