@@ -1,22 +1,41 @@
-import dbConnect from "@/lib/dbConnect";
+import dbConnect from '@/lib/dbConnect';
+import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(req) {
+    let client;
     try {
-        const collection = await dbConnect('rentPosts');
-        const data = await collection.find({}).toArray();
-        return new Response(JSON.stringify(data), { status: 200 });
+        const { searchParams } = new URL(req.url);
+        const email = searchParams.get('email'); 
+
+        const { client: dbClient, collection } = await dbConnect('rentPosts');
+        client = dbClient;
+
+        const query = email ? { email } : {};
+        const posts = await collection.find(query).toArray();
+
+        await client.close();
+        return NextResponse.json(posts, { status: 200 });
     } catch (error) {
-        return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+        if (client) await client.close();
+        console.error('Error fetching posts:', error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
 
-export async function POST(request) {
+export async function POST(req) {
+    let client;
     try {
-        const collection = await dbConnect('rentPosts');
-        const reqBody = await request.json();
-        const newPost = await collection.insertOne(reqBody);
-        return new Response(JSON.stringify(newPost), { status: 201 });
+        const { client: dbClient, collection } = await dbConnect('rentPosts');
+        client = dbClient;
+
+        const reqBody = await req.json();
+        const result = await collection.insertOne(reqBody);
+
+        await client.close();
+        return NextResponse.json(result, { status: 201 });
     } catch (error) {
-        return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+        if (client) await client.close();
+        console.error('Error creating post:', error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

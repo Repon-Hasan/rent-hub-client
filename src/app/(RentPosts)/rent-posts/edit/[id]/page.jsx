@@ -164,8 +164,8 @@ const EditRentPostsPage = () => {
             <h1 className="text-center text-4xl font-bold text-base-content mb-10 tracking-wide font-sans">
                 Edit Rent Post
             </h1>
-            <form onSubmit={handleSubmit} className="w-full px-2 sm:px-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-base-100 rounded-2xl shadow-lg p-8">
+            <form onSubmit={handleSubmit} className="w-full text-gray-700 px-2 sm:px-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white rounded-2xl shadow-lg p-8">
                     <div className="flex flex-col gap-6">
                         <div>
                             <label className="block text-sm font-medium text-base-content mb-1">Category</label>
@@ -398,8 +398,9 @@ const EditRentPostsPage = () => {
                                 name="ownerName"
                                 value={form.ownerName}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
+                                className="w-full border cursor-not-allowed border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                required readOnly
+                                
                             />
                         </div>
                         <div>
@@ -409,8 +410,8 @@ const EditRentPostsPage = () => {
                                 type="email"
                                 value={form.email}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-base text-base-content bg-base-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
+                                className="w-full border cursor-not-allowed border-gray-300 rounded-lg px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                required readOnly
                             />
                         </div>
                         <div>
