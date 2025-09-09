@@ -63,7 +63,7 @@ export default function Dashboard() {
 
     if (!session) {
         return (
-            <div className="text-center p-6">
+            <div className="text-center p-6 bg-base-100 text-base-content">
                 Access Denied. Please sign in.
             </div>
         );
@@ -80,7 +80,7 @@ export default function Dashboard() {
     }
 
     return (
-        <div>
+        <div className="bg-base-100 text-base-content min-h-screen">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <StatsCard
                     title="Total Rentals"

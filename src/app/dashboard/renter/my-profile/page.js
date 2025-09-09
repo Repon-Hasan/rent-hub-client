@@ -13,9 +13,9 @@ export default function MyProfile() {
         toast.success('Your profile loaded!');
     }, []);
 
-    return (
-        <div className="container mx-auto p-4 flex justify-center">
-            <motion.div
+        return (
+            <div className="bg-base-100 min-h-screen flex justify-center text-base-content">
+                <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
