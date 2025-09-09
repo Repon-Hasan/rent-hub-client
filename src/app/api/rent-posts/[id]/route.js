@@ -57,6 +57,35 @@ export async function PATCH(req, { params }) {
     }
 }
 
+export async function PUT(req, { params }) {
+    const { id } = params;
+    let client;
+    try {
+        const { client: dbClient, collection } = await dbConnect('rentPosts');
+        client = dbClient;
+        const body = await req.json();
+        // Remove _id from body to avoid immutable field error
+        if ('_id' in body) {
+            delete body._id;
+        }
+        const result = await collection.updateOne(
+            { _id: new ObjectId(id) },
+            { $set: body }
+        );
+        await client.close();
+
+        if (result.matchedCount === 0) {
+            return new Response('Not found', { status: 404 });
+        }
+        return new Response(JSON.stringify({ success: true }), { status: 200 });
+    } catch (error) {
+        if (client) await client.close();
+        return new Response(JSON.stringify({ error: error.message }), {
+            status: 500,
+        });
+    }
+}
+
 
 export async function DELETE(req, { params }) {
     const { id } = params;
