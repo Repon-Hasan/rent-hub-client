@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, Suspense } from "react";
+import { FaStar } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Swal from "sweetalert2";
@@ -109,100 +110,114 @@ const RentPostsList = ({ posts, handleDelete, isLoggedIn }) => {
 
   return (
     <div className="w-full mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-2 sm:px-3">
-      {posts.map((post) => (
-        <div key={post._id} className="relative flex flex-col bg-base-100 text-base-content rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 cursor-pointer overflow-hidden mx-auto">
-          {/* Floating bookmark toggle button for logged-in users */}
-          {isLoggedIn && (
-            <div className="absolute top-4 right-4 z-30">
-              <button
-                type="button"
-                aria-label="Toggle bookmark"
-                className="bg-white/80 rounded-full p-1 shadow-lg hover:bg-blue-100 transition relative"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleBookmarkToggle(post._id);
-                }}
-                disabled={bookmarkLoading === post._id}
-              >
-                <BookmarkIcon filled={!!bookmarked[post._id]} />
-                {bookmarkLoading === post._id && (
-                  <span className="absolute inset-0 flex items-center justify-center bg-white/70 rounded-full">
-                    <svg className="animate-spin h-6 w-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                    </svg>
+      {posts.map((post) => {
+        // Calculate average rating
+        const avgRating = Array.isArray(post.ratings) && post.ratings.length > 0
+          ? post.ratings.reduce((a, b) => a + b, 0) / post.ratings.length
+          : 0;
+          // const roundedRating = Math.round(avgRating * 10) / 10;
+        return (
+          <div key={post._id} className="relative flex flex-col bg-base-100 text-base-content rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 cursor-pointer overflow-hidden mx-auto">
+            {/* Floating bookmark toggle button for logged-in users */}
+            {isLoggedIn && (
+              <div className="absolute top-4 right-4 z-30">
+                <button
+                  type="button"
+                  aria-label="Toggle bookmark"
+                  className="bg-white/80 rounded-full p-1 shadow-lg hover:bg-blue-100 transition relative"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleBookmarkToggle(post._id);
+                  }}
+                  disabled={bookmarkLoading === post._id}
+                >
+                  <BookmarkIcon filled={!!bookmarked[post._id]} />
+                  {bookmarkLoading === post._id && (
+                    <span className="absolute inset-0 flex items-center justify-center bg-white/70 rounded-full">
+                      <svg className="animate-spin h-6 w-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                      </svg>
+                    </span>
+                  )}
+                </button>
+              </div>
+            )}
+            <Link href={`/rent-posts/${post._id}`} className="no-underline text-inherit">
+              <img
+                src={post.imageUrl}
+                alt={post.title}
+                className="w-full h-36 object-cover rounded-t-xl"
+              />
+              <div className="flex flex-row gap-1 px-3 pt-2">
+                <span className="bg-base-200 text-base-content text-xs font-semibold px-2 py-1 rounded-lg">
+                  {post.category}
+                </span>
+                {post.subcategory && (
+                  <span className="bg-base-200 text-base-content text-xs font-medium px-2 py-1 rounded-lg">
+                    {post.subcategory}
                   </span>
                 )}
-              </button>
-            </div>
-          )}
-          <Link href={`/rent-posts/${post._id}`} className="no-underline text-inherit">
-            <img
-              src={post.imageUrl}
-              alt={post.title}
-              className="w-full h-36 object-cover rounded-t-xl"
-            />
-            <div className="flex flex-row gap-1 px-3 pt-2">
-              <span className="bg-base-200 text-base-content text-xs font-semibold px-2 py-1 rounded-lg">
-                {post.category}
-              </span>
-              {post.subcategory && (
-                <span className="bg-base-200 text-base-content text-xs font-medium px-2 py-1 rounded-lg">
-                  {post.subcategory}
-                </span>
-              )}
-            </div>
-            <div className="flex flex-col gap-1 p-3">
-              <div className="text-xs text-base-content mb-0 font-medium truncate">
-                {post.location}
               </div>
-              <h2 className="text-base font-bold text-base-content mb-0 leading-tight truncate">
-                {post.title}
-              </h2>
-              <p className="text-xs text-base-content mb-1 leading-snug line-clamp-2">
-                {post.description}
-              </p>
-              <div className="flex items-center gap-1 mb-1">
-                <span
-                  className={`px-2 py-1 rounded-lg text-xs font-semibold ${
-                    new Date(post.availableFrom) <= new Date() &&
+              <div className="flex flex-col gap-1 p-3">
+                <div className="text-xs text-base-content mb-0 font-medium truncate">
+                  {post.location}
+                </div>
+                <div className="flex items-center gap-2 mb-0">
+                  <h2 className="text-base font-bold text-base-content leading-tight truncate">
+                    {post.title}
+                  </h2>
+                    {avgRating > 0 && (
+                      <div className="flex items-center gap-1 bg-base-200 px-1.5 py-0.5 rounded-lg">
+                        <span className="font-semibold text-base-content text-xs sm:text-sm">Rating: {avgRating.toFixed(1)}</span>
+                      </div>
+                    )}
+                </div>
+                <p className="text-xs text-base-content mb-1 leading-snug line-clamp-2">
+                  {post.description}
+                </p>
+                <div className="flex items-center gap-1 mb-1">
+                  <span
+                    className={`px-2 py-1 rounded-lg text-xs font-semibold ${
+                      new Date(post.availableFrom) <= new Date() &&
+                      new Date(post.availableTo) >= new Date()
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {new Date(post.availableFrom) <= new Date() &&
                     new Date(post.availableTo) >= new Date()
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {new Date(post.availableFrom) <= new Date() &&
-                  new Date(post.availableTo) >= new Date()
-                    ? "Available"
-                    : "Not Available"}
-                </span>
-                <span className="text-xs text-base-content">
-                  {formatDate(post.availableFrom)} -{" "}
-                  {formatDate(post.availableTo)}
-                </span>
+                      ? "Available"
+                      : "Not Available"}
+                  </span>
+                  <span className="text-xs text-base-content">
+                    {formatDate(post.availableFrom)} -{" "}
+                    {formatDate(post.availableTo)}
+                  </span>
+                </div>
+                <div className="text-base font-extrabold text-base-content mb-1">
+                  ৳
+                  {typeof post.rentPrice === "number"
+                    ? post.rentPrice.toLocaleString()
+                    : Number(post.rentPrice)
+                    ? Number(post.rentPrice).toLocaleString()
+                    : "0"}
+                  <span className="text-xs font-medium text-base-content">
+                    {['Vehicles', 'Tools & Equipment', 'Events & Venues'].includes(post.category) ? '/day' : '/month'}
+                  </span>
+                </div>
               </div>
-              <div className="text-base font-extrabold text-base-content mb-1">
-                ৳
-                {typeof post.rentPrice === "number"
-                  ? post.rentPrice.toLocaleString()
-                  : Number(post.rentPrice)
-                  ? Number(post.rentPrice).toLocaleString()
-                  : "0"}
-                <span className="text-xs font-medium text-base-content">
-                  {['Vehicles', 'Tools & Equipment', 'Events & Venues'].includes(post.category) ? '/day' : '/month'}
-                </span>
-              </div>
-            </div>
-          </Link>
-          <div className="flex flex-row gap-2 w-full px-3 pb-3">
-            <Link href={`/rent-posts/${post._id}`} className="w-full">
-              <span className="w-full bg-blue-600 text-white font-semibold py-1.5 rounded-xl text-sm hover:bg-blue-700 transition flex items-center justify-center cursor-pointer">
-                View Detail
-              </span>
             </Link>
+            <div className="flex flex-row gap-2 w-full px-3 pb-3">
+              <Link href={`/rent-posts/${post._id}`} className="w-full">
+                <span className="w-full bg-blue-600 text-white font-semibold py-1.5 rounded-xl text-sm hover:bg-blue-700 transition flex items-center justify-center cursor-pointer">
+                  View Detail
+                </span>
+              </Link>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

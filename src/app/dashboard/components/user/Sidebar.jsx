@@ -9,6 +9,7 @@ export default function UserSidebar() {
         { href: '/dashboard', label: 'Dashboard' },
         { href: '/dashboard/renter/my-orders', label: 'My Orders' },
         { href: '/dashboard/renter/my-favorites', label: 'Favorites List' },
+        { href: '/dashboard/renter/review', label: 'Reviews' },
         { href: '/dashboard/renter/my-profile', label: 'Profile' },
     ];
 

@@ -23,32 +23,55 @@ export async function GET(req, { params }) {
 
 export async function PATCH(req, { params }) {
     const { id } = params;
-    const { status } = await req.json();
-
-    if (!status) {
-        return new Response(JSON.stringify({ error: 'Status is required' }), {
-            status: 400,
-        });
-    }
     let client;
     try {
         const { client: dbClient, collection } = await dbConnect('rentPosts');
         client = dbClient;
+        const body = await req.json();
 
-        const result = await collection.updateOne(
-            { _id: new ObjectId(id) },
-            { $set: { status } },
-        );
-        await client.close();
-
-        if (result.matchedCount === 0) {
-            return new Response('Not found', { status: 404 });
+        // If review data is present, push to reviews and ratings
+        if (body.review && body.rating && body.name && body.email && body.reviewDate) {
+            const reviewObj = {
+                name: body.name,
+                email: body.email,
+                rating: body.rating,
+                description: body.review,
+                date: body.reviewDate,
+            };
+            const result = await collection.updateOne(
+                { _id: new ObjectId(id) },
+                {
+                    $push: {
+                        reviews: reviewObj,
+                        ratings: body.rating,
+                    },
+                }
+            );
+            await client.close();
+            if (result.matchedCount === 0) {
+                return new Response('Not found', { status: 404 });
+            }
+            return new Response(JSON.stringify({ message: 'Review added' }), { status: 200 });
         }
 
-        return new Response(
-            JSON.stringify({ message: 'Status updated', status }),
-            { status: 200 },
-        );
+        // Fallback: status update (legacy)
+        if (body.status) {
+            const result = await collection.updateOne(
+                { _id: new ObjectId(id) },
+                { $set: { status: body.status } },
+            );
+            await client.close();
+            if (result.matchedCount === 0) {
+                return new Response('Not found', { status: 404 });
+            }
+            return new Response(
+                JSON.stringify({ message: 'Status updated', status: body.status }),
+                { status: 200 },
+            );
+        }
+
+        await client.close();
+        return new Response(JSON.stringify({ error: 'Invalid PATCH body' }), { status: 400 });
     } catch (error) {
         if (client) await client.close();
         return new Response(JSON.stringify({ error: error.message }), {
