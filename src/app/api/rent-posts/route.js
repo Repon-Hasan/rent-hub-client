@@ -1,4 +1,5 @@
 import dbConnect from "@/lib/dbConnect";
+import { NextResponse } from 'next/server';
 
 // Simple in-memory cache
 let rentPostsCache = null;
@@ -9,47 +10,55 @@ export async function GET(req) {
     let client;
     try {
         const { searchParams } = new URL(req.url);
-        const searchQuery = searchParams.get("search");
+        const searchQuery = searchParams.get('search');
+        const email = searchParams.get('email');
 
         const dbConn = await dbConnect('rentPosts');
         client = dbConn.client;
 
-        // Check if a search query exists in the URL
+        // Case 1: Filter by email
+        if (email) {
+            const posts = await dbConn.collection.find({ email }).toArray();
+            return NextResponse.json(posts, { status: 200 });
+        }
+
+        // Case 2: Search query
         if (searchQuery) {
-            // If a search query is present, we bypass the cache
-            // and perform a new, specific database query.
-            const searchRegex = new RegExp(searchQuery, 'i'); // 'i' for case-insensitive
+            const searchRegex = new RegExp(searchQuery, 'i');
             const query = {
                 $or: [
-                    // Search in the 'title' and 'category' fields
-                    { title: { $regex: searchRegex } }, 
-                    { category: { $regex: searchRegex } }, 
+                    { title: { $regex: searchRegex } },
+                    { category: { $regex: searchRegex } },
                 ],
             };
             const data = await dbConn.collection.find(query).toArray();
-            client.close();
-            return new Response(JSON.stringify(data), { status: 200 });
+            return NextResponse.json(data, { status: 200 });
         }
-        
-        // If there is no search query, proceed with the caching logic
-        if (rentPostsCache && Date.now() - rentPostsCacheTimestamp < CACHE_TTL) {
-            return new Response(JSON.stringify(rentPostsCache), { status: 200 });
-        }
-        
-        // Fetch all data from the database
-        const data = await dbConn.collection.find({}).toArray();
-        client.close();
 
-        // Populate the cache with the full list
+        // Case 3: Cached data
+        if (
+            rentPostsCache &&
+            Date.now() - rentPostsCacheTimestamp < CACHE_TTL
+        ) {
+            return NextResponse.json(rentPostsCache, { status: 200 });
+        }
+
+        // Case 4: Fetch all posts
+        const data = await dbConn.collection.find({}).toArray();
+
         rentPostsCache = data;
         rentPostsCacheTimestamp = Date.now();
 
-        return new Response(JSON.stringify(data), { status: 200 });
+        return NextResponse.json(data, { status: 200 });
     } catch (error) {
-        if (client) client.close();
-        return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    } finally {
+        if (client) await client.close();
     }
 }
+
+
+
 
 export async function POST(request) {
     let client;

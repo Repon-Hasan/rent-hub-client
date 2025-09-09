@@ -27,20 +27,23 @@ export default function Dashboard() {
                         cache: 'no-store',
                     },
                 );
+                console.log('pages posts data: ', res)
+                
                 if (!res.ok) {
                     throw new Error(`Failed to fetch rentals: ${res.status}`);
                 }
                 const data = await res.json();
+                console.log('data home page :',data)
                 setRentals(data);
 
                 // Stats update
                 setStats({
                     totalRentals: data.length,
-                    totalUsers: session?.renter?.role === 'admin' ? 150 : 0,
+                    totalUsers: session?.user?.role === 'admin' ? 150 : 0,
                     totalVendors:
-                        session?.renter?.role === 'admin'
-                            ? data.filter((r) => r.type === 'woner').length
-                            : session?.renter?.role === 'woner'
+                        session?.user?.role === 'admin'
+                            ? data.filter((r) => r.type === 'owner').length
+                            : session?.user?.role === 'owner'
                             ? data.length
                             : 0,
                 });
@@ -72,7 +75,7 @@ export default function Dashboard() {
     let ContentComponent = UserContent;
     if (role === 'admin') {
         ContentComponent = AdminContent;
-    } else if (role === 'woner') {
+    } else if (role === 'owner') {
         ContentComponent = VendorContent;
     }
 
@@ -92,7 +95,7 @@ export default function Dashboard() {
                             icon="👥"
                         />
                         <StatsCard
-                            title="Total Woners"
+                            title="Total owners"
                             value={stats.totalVendors}
                             icon="🏪"
                         />

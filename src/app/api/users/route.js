@@ -4,39 +4,33 @@ import dbConnect from '@/lib/dbConnect';
 import { NextResponse } from 'next/server';
 import { ObjectId } from 'mongodb';
 
-export async function GET() {
-    try {
-        const session = await getServerSession(authOptions);
+export async function GET(req) {
+    // session fetch
+    const session = await getServerSession(authOptions);
+    if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-        if (!session || session.user?.role !== 'admin') {
+    // live DB থেকে user role check
+    const { collection, client } = await dbConnect('users');
+    const user = await collection.findOne({ email: session.user.email });
+
+    try {
+        if (!user || user.role !== 'admin') {
             return NextResponse.json(
                 { error: 'Unauthorized' },
                 { status: 401 },
             );
         }
-        const { client, collection } = await dbConnect('users');
+       
+        const data = await collection.find({}).toArray();
 
-        const users = await collection.find({}).toArray();
-
-        const plainUsers = users.map((user) => ({
-            ...user,
-            _id: user?._id?.toString(),
-            email: user.email,
-            role: user.role || 'renter',
-        }));
-
-        
+        return NextResponse.json(data, { status: 200 });
+    } finally {
         await client.close();
-
-        return NextResponse.json(plainUsers);
-    } catch (err) {
-        console.error('Error fetching users:', err);
-        return NextResponse.json(
-            { error: 'Something went wrong' },
-            { status: 500 },
-        );
     }
 }
+
 
 export async function DELETE(req) {
     const session = await getServerSession(authOptions);

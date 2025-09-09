@@ -7,8 +7,9 @@ export default function UserSidebar() {
     const pathname = usePathname();
     const links = [
         { href: '/dashboard', label: 'Dashboard' },
-        { href: '/dashboard/rentals', label: 'Browse Rentals' },
-        { href: '/dashboard/favorites', label: 'Favorites' },
+        { href: '/dashboard/renter/my-orders', label: 'My Orders' },
+        { href: '/dashboard/renter/my-favorites', label: 'Favorites List' },
+        { href: '/dashboard/renter/my-profile', label: 'Profile' },
     ];
 
     return (

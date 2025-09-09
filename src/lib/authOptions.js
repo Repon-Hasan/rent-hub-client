@@ -3,6 +3,13 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import clientPromise from "./mongodb";
 import bcrypt from "bcryptjs";
 
+async function getUserRole(email) {
+    const client = await clientPromise;
+    const db = client.db('RentHub');
+    const user = await db.collection('users').findOne({ email });
+    return user?.role || 'renter';
+}
+
 export const authOptions = {
   providers: [
     // Google Sign-In
@@ -32,9 +39,10 @@ export const authOptions = {
         }
 
         return {
-          id: user._id.toString(), // Convert ObjectId to string for JWT serialization
+          id: user._id.toString(), 
           email: user.email,
           role: user.role,
+          // name: user.name
         };
       },
     }),
@@ -70,6 +78,9 @@ export const authOptions = {
         token.id = user.id;
         token.role = user.role;
       }
+      if (token.email) {
+          token.role = await getUserRole(token.email);
+      }
       return token;
     },
 
@@ -77,7 +88,7 @@ export const authOptions = {
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id;
-        session.user.role = token.role;
+        session.user.role = await getUserRole(token.email);
       }
       return session;
     },

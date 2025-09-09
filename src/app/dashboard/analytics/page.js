@@ -12,8 +12,8 @@ import {
     Legend,
     ResponsiveContainer,
 } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { useToast as toast } from '@/components/ui/useToast';
+import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
+import { useToast as toast } from '@/app/components/useToast';
 
 export default function Analytics() {
     const { data: session } = useSession();

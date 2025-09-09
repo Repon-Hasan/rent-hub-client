@@ -2,7 +2,6 @@
 
 import { CustomButton } from '@/app/components/CustomButton';
 import { Input } from '@/app/components/Input';
-// import { Input } from '@app/components/Input';
 import {
     Table,
     TableBody,
@@ -27,16 +26,16 @@ export default function ManageRentals() {
     const fetchRentals = async () => {
         setLoading(true);
         try {
-            const res = await fetch(
+            const url = new URL(
                 `${process.env.NEXT_PUBLIC_BASE_URL}/api/rent-posts`,
-                { cache: 'no-store' },
             );
+            if (search) url.searchParams.append('search', search);
+
+            const res = await fetch(url.toString(), { cache: 'no-store' });
             if (!res.ok) throw new Error('Failed to fetch rentals');
 
             const data = await res.json();
-            console.log('data from API:', data); 
-
-            setRentals(data || []); // rentals array
+            setRentals(data || []);
             setTotalPages(data.totalPages || 1);
         } catch (error) {
             console.error('Error fetching rentals:', error);
@@ -50,54 +49,53 @@ export default function ManageRentals() {
         }
     };
 
-
     useEffect(() => {
         if (session?.user?.role === 'admin') fetchRentals();
     }, [session, page, search]);
 
-    const handleAction = async (id, action) => {
+    // handleAction: Accept & Reject
+    const handleAction = async (id, status) => {
         try {
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_BASE_URL}/api/rent-posts/${id}`,
                 {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action }),
+                    body: JSON.stringify({ status }),
                 },
             );
-            if (!res.ok) {
-                throw new Error(
-                    `Failed to ${action} rental: ${res.status} ${res.statusText}`,
-                );
-            }
-            toast({ title: 'Success', description: `Rental ${action}ed` });
-            fetchRentals();
+            if (!res.ok) throw new Error(`Failed to update rental`);
+
+            toast({ title: 'Success', description: `Rental ${status}` });
+
+            // Local state update for instant UI refresh
+            setRentals((prev) =>
+                prev.map((r) => (r._id === id ? { ...r, status } : r)),
+            );
         } catch (error) {
-            console.error(`Error ${action}ing rental:`, error);
+            console.error(`Error updating rental:`, error);
             toast({
                 title: 'Error',
-                description: `Failed to ${action} rental`,
+                description: `Failed to update rental`,
                 variant: 'destructive',
             });
         }
     };
 
+    // handleDelete: Delete only
     const handleDelete = async (id) => {
         if (!confirm('Are you sure you want to delete this rental?')) return;
         try {
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_BASE_URL}/api/rent-posts/${id}`,
-                {
-                    method: 'DELETE',
-                },
+                { method: 'DELETE' },
             );
-            if (!res.ok) {
-                throw new Error(
-                    `Failed to delete rental: ${res.status} ${res.statusText}`,
-                );
-            }
+            if (!res.ok) throw new Error('Failed to delete rental');
+
             toast({ title: 'Success', description: 'Rental deleted' });
-            fetchRentals();
+
+            // Remove deleted item from local state instantly
+            setRentals((prev) => prev.filter((r) => r._id !== id));
         } catch (error) {
             console.error('Error deleting rental:', error);
             toast({
@@ -121,6 +119,7 @@ export default function ManageRentals() {
             <h1 className="text-2xl font-bold mb-4">
                 Custom Rentals Management
             </h1>
+
             <div className="mb-4">
                 <Input
                     placeholder="Search by title or email..."
@@ -129,6 +128,7 @@ export default function ManageRentals() {
                     className="max-w-md"
                 />
             </div>
+
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -143,38 +143,41 @@ export default function ManageRentals() {
                         <TableRow className="text-gray-700" key={rental._id}>
                             <TableCell>{rental.title}</TableCell>
                             <TableCell>{rental.email}</TableCell>
-                            <TableCell>{rental.status}</TableCell>
-                            <TableCell>
+                            <TableCell className="capitalize">
+                                {rental.status || 'pending'}
+                            </TableCell>
+                            <TableCell className="flex gap-2">
                                 <CustomButton
                                     onClick={() =>
-                                        handleAction(rental._id, 'approve')
+                                        handleAction(rental._id, 'approved')
                                     }
                                     disabled={rental.status === 'approved'}
-                                    className="mr-2"
                                 >
-                                    Approve
+                                    Accept
                                 </CustomButton>
+
                                 <CustomButton
                                     onClick={() =>
-                                        handleAction(rental._id, 'reject')
+                                        handleAction(rental._id, 'rejected')
                                     }
                                     disabled={rental.status === 'rejected'}
                                     variant="outline"
-                                    className="mr-2"
                                 >
                                     Reject
                                 </CustomButton>
+
                                 <CustomButton
                                     onClick={() => handleDelete(rental._id)}
                                     variant="destructive"
                                 >
-                                    Delete
+                                    🗑 Delete
                                 </CustomButton>
                             </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
             </Table>
+
             <div className="flex justify-between mt-4">
                 <CustomButton
                     disabled={page === 1}

@@ -6,17 +6,18 @@ import { toast } from 'react-hot-toast';
 import { motion } from 'framer-motion';
 
 export default function ManageUsers() {
-    const { data: session } = useSession();
+    const { data: session, update } = useSession();
     const [users, setUsers] = useState([]);
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(true);
-    const api = process.env.NEXT_PUBLIC_BASE_URL;
 
     const fetchUsers = async () => {
         setLoading(true);
         try {
             const res = await fetch(
-                `/api/users?search=${encodeURIComponent(search)}`,
+                `${
+                    process.env.NEXT_PUBLIC_BASE_URL
+                }/api/users?search=${encodeURIComponent(search)}`,
                 { cache: 'no-store' },
             );
             if (!res.ok) throw new Error('Failed to fetch users');
@@ -41,6 +42,9 @@ export default function ManageUsers() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id, role }),
             });
+            const data = await res.json();
+
+            await update({role: data.role});
 
             if (!res.ok) throw new Error('Failed to update role');
 
@@ -158,8 +162,8 @@ export default function ManageUsers() {
                                                 )
                                             }
                                         >
-                                            <option value="user">Renter</option>
-                                            <option value="vendor">
+                                            <option value="renter">Renter</option>
+                                            <option value="owner">
                                                 Owner
                                             </option>
                                             <option value="admin">Admin</option>
