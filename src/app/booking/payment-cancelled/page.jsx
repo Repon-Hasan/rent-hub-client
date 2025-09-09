@@ -4,10 +4,10 @@ import Link from "next/link";
 
 const Page = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-red-50 p-6">
-      <div className="bg-white p-8 rounded-2xl shadow-lg text-center max-w-md">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-base-300 p-6">
+      <div className="bg-base-100 p-8 rounded-2xl shadow-lg text-center max-w-md">
         <h1 className="text-3xl font-bold text-red-600 mb-4">⚠️ Payment Cancelled</h1>
-        <p className="text-gray-700 mb-6">
+        <p className=" mb-6">
           Your payment was not completed. You can try booking again.
         </p>
         <Link

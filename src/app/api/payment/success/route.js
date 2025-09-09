@@ -41,12 +41,12 @@ export async function POST(req) {
 
     // Redirect
     if (status === "VALID") {
-      return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/success`);
+      return Response.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/success`);
     } else {
-      return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/fail`);
+      return Response.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/fail`);
     }
   } catch (err) {
     console.error("Payment Success Error:", err);
-    return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
+    return Response.json({ error: "Something went wrong" }, { status: 500 });
   }
 }

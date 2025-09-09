@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 
@@ -8,11 +7,12 @@ export async function POST(req) {
     const tran_id = formData.get("tran_id");
     const status = formData.get("status"); // VALID / FAILED
 
-    if (!tran_id)
-      return NextResponse.json(
-        { error: "Transaction ID missing" },
-        { status: 400 }
+    if (!tran_id) {
+      return new Response(
+        JSON.stringify({ error: "Transaction ID missing" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
+    }
 
     const client = await clientPromise;
     const db = client.db(process.env.DB_NAME);
@@ -22,11 +22,13 @@ export async function POST(req) {
       tran_id,
       status: "pending",
     });
-    if (!pendingBooking)
-      return NextResponse.json(
-        { error: "Pending booking not found" },
-        { status: 404 }
+    
+    if (!pendingBooking) {
+      return new Response(
+        JSON.stringify({ error: "Pending booking not found" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
       );
+    }
 
     if (status === "VALID") {
       // Update booking status to confirmed
@@ -38,9 +40,9 @@ export async function POST(req) {
         );
       // Increment rentCount in rentPost collection
       await db.collection("rentPost").updateOne(
-        { _id: pendingBooking.postId }, // assuming postId is stored in booking
+        { _id: pendingBooking.postId },
         { $inc: { rentCount: 1 } },
-        { upsert: true } // create rentCount if it doesn't exist
+        { upsert: true }
       );
     }
 
@@ -57,21 +59,21 @@ export async function POST(req) {
       date: new Date(),
     });
 
-    // Redirect user to proper page
+    // Redirect user to proper page using Response.redirect
     if (status === "VALID") {
-      return NextResponse.redirect(
+      return Response.redirect(
         `${process.env.NEXT_PUBLIC_BASE_URL}/booking/payment-success`
       );
     } else {
-      return NextResponse.redirect(
+      return Response.redirect(
         `${process.env.NEXT_PUBLIC_BASE_URL}/booking/payment-cancelled`
       );
     }
   } catch (err) {
     console.error("Booking Payment Success Error:", err);
-    return NextResponse.json(
-      { error: "Something went wrong" },
-      { status: 500 }
+    return new Response(
+      JSON.stringify({ error: "Something went wrong" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 }
